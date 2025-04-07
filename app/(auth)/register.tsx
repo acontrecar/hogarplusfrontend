@@ -163,7 +163,7 @@ export default function RegisterScreen() {
           render={({ field: { onChange, value } }) => (
             <TextInput
               style={authStyles.input}
-              placeholder="Contraseña"
+              placeholder="Nombre"
               placeholderTextColor="#A0A0A0"
               secureTextEntry
               onChangeText={onChange}
