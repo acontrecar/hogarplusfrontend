@@ -1,38 +1,63 @@
 import { hogarPlusApi } from "../../config/api/hogarPlusApi";
-import { User, UserData } from "../../domain/entities/user";
-import { AuthRegisterResponse } from "../../infraestructure/interfaces/auth.responses";
 import {
-  AuthToRegister,
+  AuthRegisterResponse,
   AuthUserWithToken,
+} from "../../infraestructure/interfaces/auth/auth.responses";
+import {
+  AuthToLogin,
+  AuthToRegister,
 } from "../../infraestructure/interfaces/auth/auth.interfaces";
+import { handleApiCall } from "../handleApiCall";
+import { GlobalApiResponse } from "../../infraestructure/interfaces/global/global-api-response";
 
 export const authRegister = async (
   name: string,
   email: string,
   password: string
-): Promise<AuthUserWithToken | null> => {
-  email = email.toLowerCase();
+): Promise<GlobalApiResponse<AuthUserWithToken> | null> => {
   const user: AuthToRegister = {
     user: {
       name,
+      email: email.toLowerCase(),
+      password,
+    },
+  };
+
+  return handleApiCall(() =>
+    hogarPlusApi.post<GlobalApiResponse<AuthUserWithToken>>(
+      "/auth/register",
+      user
+    )
+  );
+};
+
+export const authLogin = async (
+  email: string,
+  password: string
+): Promise<GlobalApiResponse<AuthUserWithToken> | null> => {
+  email = email.toLowerCase();
+  const user: AuthToLogin = {
+    user: {
       email,
       password,
     },
   };
 
-  try {
-    const { data } = await hogarPlusApi.post<AuthRegisterResponse>("/user", {
-      user,
-    });
-
-    return returnUserToken(data);
-  } catch (error) {
-    console.log(`Register error: ${error}`);
-    return null;
-  }
+  return handleApiCall(() =>
+    hogarPlusApi.post<GlobalApiResponse<AuthUserWithToken>>("/auth/login", user)
+  );
 };
 
+export const authCheckStatus =
+  async (): Promise<GlobalApiResponse<AuthUserWithToken> | null> => {
+    return handleApiCall(() =>
+      hogarPlusApi.get<GlobalApiResponse<AuthUserWithToken>>("/auth/me")
+    );
+  };
+
 function returnUserToken(data: AuthRegisterResponse) {
+  console.log("La data del registro es: ", data);
+
   const user: AuthUserWithToken = {
     user: {
       id: data.user.id,

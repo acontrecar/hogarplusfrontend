@@ -4,8 +4,9 @@ import { Text, TextInput, Pressable, View } from "react-native";
 import { MotiViewCustom } from "../../ui/components/MotiViewCustom";
 import { authStyles } from "../../ui/styles/auth.styles";
 import { useAuthStore } from "../../store/auth";
-import { AUTH_ROUTES } from "../../constants/routes";
+import { APP_ROUTES, AUTH_ROUTES } from "../../constants/routes";
 import { globalStyles } from "../../constants/styles";
+import { useState } from "react";
 
 type LoginFormInputs = {
   email: string;
@@ -14,27 +15,38 @@ type LoginFormInputs = {
 
 export default function LoginScreen() {
   const router = useRouter();
-  // const { login } = useAuthStore();
-
+  const [errorApi, setErrorApi] = useState("");
+  const { logIn, errorMessage } = useAuthStore();
   const {
     control,
     handleSubmit,
     formState: { errors },
   } = useForm<LoginFormInputs>({
     defaultValues: {
-      email: "",
-      password: "",
+      email: "antonio@example1.com",
+      password: "supersegura123",
     },
     mode: "onChange",
   });
 
   const onSubmit = async (data: LoginFormInputs) => {
-    // const success = await login(data.email, data.password);
-    // if (success) {
-    //   router.replace("/home");
-    // } else {
-    //   alert("Credenciales incorrectas.");
-    // }
+    setErrorApi("");
+    const { email, password } = data;
+
+    if (email.trim().length === 0 || password.trim().length < 6) {
+      setErrorApi("El correo o la contraseña no puede estar vacío.");
+      return;
+    }
+
+    const success = await logIn(email, password);
+
+    console.log({ success });
+
+    if (!success) {
+      setErrorApi("Error al registrar.");
+    } else {
+      router.replace(APP_ROUTES.home);
+    }
   };
 
   const handleToRegister = () => {
@@ -49,6 +61,12 @@ export default function LoginScreen() {
           Organización y armonía, todo en un solo lugar.
         </Text>
       </MotiViewCustom>
+
+      {errorMessage && (
+        <MotiViewCustom>
+          <Text>{errorMessage}</Text>
+        </MotiViewCustom>
+      )}
 
       <MotiViewCustom style={authStyles.toggleContainer}>
         <Pressable

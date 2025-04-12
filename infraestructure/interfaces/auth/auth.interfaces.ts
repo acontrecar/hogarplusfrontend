@@ -1,4 +1,4 @@
-import { UserI } from "../auth.responses";
+import { UserI } from "./auth.responses";
 
 export interface AuthToRegister {
   user: {
@@ -8,7 +8,14 @@ export interface AuthToRegister {
   };
 }
 
-export interface AuthUserWithToken {
-  user: UserI;
-  token: string;
+export interface AuthToLogin {
+  user: {
+    email: string;
+    password: string;
+  };
 }
+
+// export interface AuthUserWithToken {
+//   user: UserI;
+//   token: string;
+// }

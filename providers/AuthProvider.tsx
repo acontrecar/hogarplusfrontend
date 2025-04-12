@@ -9,7 +9,9 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
 
   useEffect(() => {
     const checkAuth = async () => {
-      await checkToken();
+      checkToken();
+
+      console.log({ status });
 
       if (status === "authenticated") {
         router.replace(APP_ROUTES.home);

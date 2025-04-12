@@ -1,10 +1,15 @@
 import React from "react";
-import { Text, View } from "react-native";
+import { Pressable, Text, View } from "react-native";
+import { useAuthStore } from "../../store/auth";
 
 export default function HomeScreen() {
+  const { logOut } = useAuthStore();
+
   return (
     <View>
-      <Text>HomeScreen</Text>
+      <Pressable onPress={logOut}>
+        <Text>Log out</Text>
+      </Pressable>
     </View>
   );
 }

@@ -4,8 +4,9 @@ import { Text, TextInput, Pressable, View } from "react-native";
 import { MotiViewCustom } from "../../ui/components/MotiViewCustom";
 import { authStyles } from "../../ui/styles/auth.styles";
 import { useAuthStore } from "../../store/auth";
-import { AUTH_ROUTES } from "../../constants/routes";
+import { APP_ROUTES, AUTH_ROUTES } from "../../constants/routes";
 import { globalStyles } from "../../constants/styles";
+import { useState } from "react";
 
 type RegisterFormInputs = {
   email: string;
@@ -16,7 +17,8 @@ type RegisterFormInputs = {
 
 export default function RegisterScreen() {
   const router = useRouter();
-  // const { login } = useAuthStore();
+  const [errorApi, setErrorApi] = useState("");
+  const { register, errorMessage } = useAuthStore();
 
   const {
     control,
@@ -24,21 +26,32 @@ export default function RegisterScreen() {
     formState: { errors },
   } = useForm<RegisterFormInputs>({
     defaultValues: {
-      email: "",
-      password: "",
-      confirmPassword: "",
-      name: "",
+      email: "prueba@prueba.com",
+      password: "seguroMucho123",
+      confirmPassword: "seguroMucho123",
+      name: "Antonio",
     },
     mode: "onChange",
   });
 
   const onSubmit = async (data: RegisterFormInputs) => {
-    // const success = await login(data.email, data.password);
-    // if (success) {
-    //   router.replace("/home");
-    // } else {
-    //   alert("Credenciales incorrectas.");
-    // }
+    setErrorApi("");
+    const { name, email, password, confirmPassword } = data;
+
+    if (password !== confirmPassword) {
+      setErrorApi("Las contraseñas no coinciden.");
+      return;
+    }
+
+    const success = await register(name, email, password);
+
+    console.log({ success });
+
+    if (!success) {
+      setErrorApi("Error al registrar.");
+    } else {
+      router.replace(APP_ROUTES.home);
+    }
   };
 
   const handleToLogin = () => {
@@ -53,6 +66,12 @@ export default function RegisterScreen() {
           Organización y armonía, todo en un solo lugar.
         </Text>
       </MotiViewCustom>
+
+      {errorMessage && (
+        <MotiViewCustom>
+          <Text>{errorMessage}</Text>
+        </MotiViewCustom>
+      )}
 
       <MotiViewCustom style={authStyles.toggleContainer}>
         <Pressable style={authStyles.toggleButton}>
@@ -165,7 +184,6 @@ export default function RegisterScreen() {
               style={authStyles.input}
               placeholder="Nombre"
               placeholderTextColor="#A0A0A0"
-              secureTextEntry
               onChangeText={onChange}
               value={value}
             />
