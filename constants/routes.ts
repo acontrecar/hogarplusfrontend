@@ -4,7 +4,7 @@ export const AUTH_ROUTES = {
 };
 
 export const APP_ROUTES = {
-  home: "/(home)",
+  home: "/(home)/(tabs)",
 };
 
 export const LOADER_ROUTES = {
