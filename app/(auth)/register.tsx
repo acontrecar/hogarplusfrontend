@@ -68,8 +68,8 @@ export default function RegisterScreen() {
       </MotiViewCustom>
 
       {errorMessage && (
-        <MotiViewCustom>
-          <Text>{errorMessage}</Text>
+        <MotiViewCustom style={authStyles.errorContainer}>
+          <Text style={authStyles.errorText}>{errorMessage}</Text>
         </MotiViewCustom>
       )}
 

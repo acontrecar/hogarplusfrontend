@@ -16,11 +16,9 @@ export const authRegister = async (
   password: string
 ): Promise<GlobalApiResponse<AuthUserWithToken> | null> => {
   const user: AuthToRegister = {
-    user: {
-      name,
-      email: email.toLowerCase(),
-      password,
-    },
+    name,
+    email: email.toLowerCase(),
+    password,
   };
 
   return handleApiCall(() =>
@@ -37,10 +35,8 @@ export const authLogin = async (
 ): Promise<GlobalApiResponse<AuthUserWithToken> | null> => {
   email = email.toLowerCase();
   const user: AuthToLogin = {
-    user: {
-      email,
-      password,
-    },
+    email,
+    password,
   };
 
   return handleApiCall(() =>

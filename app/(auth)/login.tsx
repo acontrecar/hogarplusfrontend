@@ -23,7 +23,7 @@ export default function LoginScreen() {
     formState: { errors },
   } = useForm<LoginFormInputs>({
     defaultValues: {
-      email: "antonio@example1.com",
+      email: "antonio@example.com",
       password: "supersegura123",
     },
     mode: "onChange",
@@ -63,8 +63,8 @@ export default function LoginScreen() {
       </MotiViewCustom>
 
       {errorMessage && (
-        <MotiViewCustom>
-          <Text>{errorMessage}</Text>
+        <MotiViewCustom style={authStyles.errorContainer}>
+          <Text style={authStyles.errorText}>{errorMessage}</Text>
         </MotiViewCustom>
       )}
 

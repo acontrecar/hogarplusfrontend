@@ -1,9 +1,14 @@
 import { create } from "zustand";
 import AsyncStore from "@react-native-async-storage/async-storage";
 import { AuthStatus } from "../infraestructure/interfaces/auth.status";
-import { authCheckStatus, authLogin, authRegister } from "../action/auth/auth";
+import {
+  authCheckStatus,
+  authLogin,
+  authRegister,
+} from "../action/auth/auth.action";
 import { User } from "../domain/entities/user";
 import { StorageAdapter } from "../config/adapters/async-storage";
+import { updateUserProfile } from "../action/user/user.action";
 
 interface AuthState {
   status: AuthStatus;
@@ -15,10 +20,11 @@ interface AuthState {
   register: (name: string, email: string, password: string) => Promise<boolean>;
   logOut: () => void;
   logIn: (email: string, password: string) => Promise<boolean>;
+  updateProfile: (formData: FormData) => Promise<boolean>;
 }
 
 export const useAuthStore = create<AuthState>((set) => ({
-  status: "cheking",
+  status: "checking",
   token: undefined,
   user: undefined,
   errorMessage: undefined,
@@ -92,6 +98,23 @@ export const useAuthStore = create<AuthState>((set) => ({
       errorMessage: undefined,
     });
 
+    return true;
+  },
+
+  updateProfile: async (formData: FormData) => {
+    const resp = await updateUserProfile(formData);
+
+    if (!resp) {
+      set({ errorMessage: "Error inesperado" });
+      return false;
+    }
+
+    if (!resp.ok) {
+      set({ errorMessage: resp.message });
+      return false;
+    }
+
+    set({ user: resp.data, errorMessage: undefined });
     return true;
   },
 }));

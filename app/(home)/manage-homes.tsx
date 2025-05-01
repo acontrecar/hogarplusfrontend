@@ -2,11 +2,12 @@ import { View, Text, StyleSheet } from "react-native";
 import { MotiViewCustom } from "../../ui/components/MotiViewCustom";
 import { ButtonCustom } from "../../ui/components/ButtonCustom";
 import { globalStyles } from "../../constants/styles";
+import { AnimatedButtonCustom } from "../../ui/components/AnimatedButtonCustom";
 
 export default function ManageHomesScreen() {
   return (
     <MotiViewCustom style={globalStyles.container}>
-      <ButtonCustom label="Crear hogar" />
+      <AnimatedButtonCustom label="Crear hogar" />
     </MotiViewCustom>
   );
 }

@@ -81,4 +81,12 @@ export const authStyles = StyleSheet.create({
     fontWeight: "600",
     fontSize: 16,
   },
+  errorContainer: {
+    marginBottom: 15,
+    alignItems: "center",
+  },
+  errorText: {
+    color: colors.accentRed,
+    fontSize: 16,
+  },
 });

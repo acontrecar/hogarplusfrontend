@@ -18,11 +18,38 @@ import { useState } from "react";
 import { CameraAdapter } from "../../../config/adapters/camera-adapter";
 import { FontAwesome } from "@expo/vector-icons";
 import { useRouter } from "expo-router";
+import { AnimatedButtonCustom } from "../../../ui/components/AnimatedButtonCustom";
+import { Controller, useForm } from "react-hook-form";
+import ToastService from "../../../services/ToastService";
+
+type ProfileFormInputs = {
+  name: string;
+  email: string;
+  password: string;
+  phone: string;
+};
 
 export default function ProfileScreen() {
-  const [profileImage, setProfileImage] = useState<string | null>(null);
+  const { logOut, updateProfile, user, errorMessage } = useAuthStore();
+  const [profileImage, setProfileImage] = useState<string | null>(
+    user?.avatar ?? null
+  );
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const { logOut } = useAuthStore();
+  const {
+    control,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<ProfileFormInputs>({
+    defaultValues: {
+      email: user?.email || "",
+      password: "",
+      name: user?.name || "",
+      phone: user?.phone || "",
+    },
+    mode: "onChange",
+  });
+
   const { width } = useScreenDimensions();
   const router = useRouter();
 
@@ -46,6 +73,38 @@ export default function ProfileScreen() {
     ]);
   };
 
+  const onSubmit = async (data: ProfileFormInputs) => {
+    setIsSubmitting(true);
+
+    const formData = new FormData();
+    formData.append("updateUserDto", JSON.stringify(data));
+
+    if (profileImage) {
+      const fileName = profileImage.split("/").pop();
+      formData.append("image", {
+        uri: profileImage,
+        type: "image/jpeg",
+        name: fileName,
+      } as any);
+    }
+
+    const success = await updateProfile(formData);
+
+    if (success) {
+      ToastService.success(
+        "Perfil actualizado",
+        "Tus cambios fueron guardados correctamente"
+      );
+    } else {
+      ToastService.error(
+        "Error al actualizar",
+        "Verifica tus datos o intenta más tarde."
+      );
+    }
+
+    setIsSubmitting(false);
+  };
+
   return (
     <MotiViewCustom style={globalStyles.container}>
       <TouchableOpacity onPress={handleSelectImage}>
@@ -58,41 +117,119 @@ export default function ProfileScreen() {
         )}
       </TouchableOpacity>
 
+      {errorMessage && (
+        <MotiViewCustom style={globalStyles.errorContainer}>
+          <Text style={globalStyles.errorText}>{errorMessage}</Text>
+        </MotiViewCustom>
+      )}
+
       <MotiViewCustom style={globalStyles.form}>
-        <TextInput
-          style={[globalStyles.input, { width: width * 0.7 }]}
-          placeholder="Correo electrónico"
-          placeholderTextColor="#A0A0A0"
-          //   onChangeText={onChange}
-          //   value={value}
-          keyboardType="email-address"
-          autoCapitalize="none"
+        <Controller
+          control={control}
+          name="email"
+          rules={{
+            pattern: {
+              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+              message: "Correo inválido.",
+            },
+          }}
+          render={({ field: { onChange, value } }) => (
+            <TextInput
+              style={[globalStyles.input, { width: width * 0.7 }]}
+              placeholder="Correo electrónico"
+              placeholderTextColor="#A0A0A0"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              value={value}
+              onChangeText={onChange}
+            />
+          )}
         />
-        <TextInput
-          style={[globalStyles.input, { width: width * 0.7 }]}
-          placeholder="Contraseña"
-          placeholderTextColor="#A0A0A0"
-          secureTextEntry
+        {errors.email && (
+          <MotiViewCustom>
+            <Text style={{ color: "red" }}>{errors.email.message}</Text>
+          </MotiViewCustom>
+        )}
+
+        <Controller
+          control={control}
+          name="password"
+          rules={{
+            minLength: {
+              value: 6,
+              message: "Mínimo 6 caracteres.",
+            },
+          }}
+          render={({ field: { onChange, value } }) => (
+            <TextInput
+              style={[globalStyles.input, { width: width * 0.7 }]}
+              placeholder="Contraseña"
+              placeholderTextColor="#A0A0A0"
+              secureTextEntry
+              value={value}
+              onChangeText={onChange}
+            />
+          )}
         />
-        <TextInput
-          style={[globalStyles.input, { width: width * 0.7 }]}
-          placeholder="Telefono de contacto"
-          placeholderTextColor="#A0A0A0"
-          keyboardType="phone-pad"
-          autoCapitalize="none"
+        {errors.password && (
+          <MotiViewCustom>
+            <Text style={{ color: "red" }}>{errors.password.message}</Text>
+          </MotiViewCustom>
+        )}
+
+        <Controller
+          control={control}
+          name="name"
+          render={({ field: { onChange, value } }) => (
+            <TextInput
+              style={[globalStyles.input, { width: width * 0.7 }]}
+              placeholder="Nombre"
+              placeholderTextColor="#A0A0A0"
+              value={value}
+              onChangeText={onChange}
+            />
+          )}
         />
+
+        <Controller
+          control={control}
+          name="phone"
+          rules={{
+            pattern: {
+              value: /^\+?[0-9]{7,15}$/,
+              message: "Teléfono inválido.",
+            },
+          }}
+          render={({ field: { onChange, value } }) => (
+            <TextInput
+              style={[globalStyles.input, { width: width * 0.7 }]}
+              placeholder="Teléfono de contacto"
+              placeholderTextColor="#A0A0A0"
+              keyboardType="phone-pad"
+              value={value}
+              onChangeText={onChange}
+            />
+          )}
+        />
+        {errors.phone && (
+          <MotiViewCustom>
+            <Text style={{ color: "red" }}>{errors.phone.message}</Text>
+          </MotiViewCustom>
+        )}
       </MotiViewCustom>
 
-      <ButtonCustom
+      <AnimatedButtonCustom
         customStyles={{ backgroundColor: colors.primaryLight }}
-        label="Cambiar datos"
+        label={isSubmitting ? "Actualizando..." : "Cambiar datos"}
+        onPress={handleSubmit(onSubmit)}
+        disabled={isSubmitting}
       />
-      <ButtonCustom
+      <AnimatedButtonCustom
         customStyles={{ backgroundColor: colors.infoBlue }}
         label="Gestionar viviendas"
         onPress={() => router.push("/(home)/manage-homes")}
       />
-      <ButtonCustom
+      <AnimatedButtonCustom
         customStyles={{ backgroundColor: colors.accentRed }}
         onPress={logOut}
         label="Salir"

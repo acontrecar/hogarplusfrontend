@@ -25,4 +25,12 @@ export const globalStyles = StyleSheet.create({
     alignItems: "center",
     margin: 16,
   },
+  errorContainer: {
+    marginBottom: 15,
+    alignItems: "center",
+  },
+  errorText: {
+    color: colors.accentRed,
+    fontSize: 16,
+  },
 });
