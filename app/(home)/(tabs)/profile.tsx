@@ -9,8 +9,7 @@ import {
   View,
 } from "react-native";
 import { MotiViewCustom } from "../../../ui/components/MotiViewCustom";
-import { useAuthStore } from "../../../store/auth";
-import { ButtonCustom } from "../../../ui/components/ButtonCustom";
+import { useAuthStore } from "../../../store/useAuthStore";
 import { globalStyles } from "../../../constants/styles";
 import colors from "../../../constants/colors";
 import { useScreenDimensions } from "../../../hooks/useScreenDimensions";

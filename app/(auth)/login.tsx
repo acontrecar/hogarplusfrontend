@@ -3,7 +3,7 @@ import { useRouter } from "expo-router";
 import { Text, TextInput, Pressable, View } from "react-native";
 import { MotiViewCustom } from "../../ui/components/MotiViewCustom";
 import { authStyles } from "../../ui/styles/auth.styles";
-import { useAuthStore } from "../../store/auth";
+import { useAuthStore } from "../../store/useAuthStore";
 import { APP_ROUTES, AUTH_ROUTES } from "../../constants/routes";
 import { globalStyles } from "../../constants/styles";
 import { useState } from "react";

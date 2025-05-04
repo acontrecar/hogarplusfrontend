@@ -1,5 +1,5 @@
 import { useRouter } from "expo-router";
-import { useAuthStore } from "../store/auth";
+import { useAuthStore } from "../store/useAuthStore";
 import { PropsWithChildren, useEffect } from "react";
 import { APP_ROUTES, AUTH_ROUTES, LOADER_ROUTES } from "../constants/routes";
 
