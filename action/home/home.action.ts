@@ -3,6 +3,7 @@ import { GlobalApiResponse } from "../../infraestructure/interfaces/global/globa
 import {
   CreateHomeResponse,
   GetHomeByUserResponse,
+  GetHomeDetails,
   HomesByUser,
 } from "../../infraestructure/interfaces/home/home.interfaces";
 import { handleApiCall } from "../handleApiCall";
@@ -23,3 +24,11 @@ export const getHomesByUser =
       hogarPlusApi.get<GlobalApiResponse<GetHomeByUserResponse>>("/home")
     );
   };
+
+export const getHomeDetails = async (
+  homeId: number
+): Promise<GlobalApiResponse<GetHomeDetails> | null> => {
+  return handleApiCall(() =>
+    hogarPlusApi.get<GlobalApiResponse<GetHomeDetails>>(`/home/${homeId}`)
+  );
+};

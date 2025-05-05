@@ -1,4 +1,10 @@
-import { View, Text, StyleSheet, ScrollView } from "react-native";
+import {
+  View,
+  Text,
+  StyleSheet,
+  ScrollView,
+  RefreshControl,
+} from "react-native";
 import { MotiViewCustom } from "../../ui/components/MotiViewCustom";
 import { globalStyles } from "../../constants/styles";
 import { AnimatedButtonCustom } from "../../ui/components/AnimatedButtonCustom";
@@ -7,16 +13,36 @@ import ToastService from "../../services/ToastService";
 import { Link } from "expo-router";
 import { useHomeStore } from "../../store/useHomeStore";
 import { HomesByUser } from "../../infraestructure/interfaces/home/home.interfaces";
+import FontAwesome6 from "@expo/vector-icons/FontAwesome6";
+import colors from "../../constants/colors";
+import { HomeCard } from "../../ui/components/HomeCard";
+import { HomeDisplay } from "../../ui/components/HomeDisplay";
+import Entypo from "@expo/vector-icons/Entypo";
+import Loader from "../loader";
 
 export default function ManageHomesScreen() {
   const [visibleModal, setVisibleModal] = useState(true);
   const [homesMember, setHomesMember] = useState<HomesByUser[]>([]);
   const [homesAdmin, setHomesAdmin] = useState<HomesByUser[]>([]);
 
-  const { isLoading, homesByUser, getHomesByUser } = useHomeStore();
+  const { isLoading, homesByUser, errorMessage, getHomesByUser } =
+    useHomeStore();
 
-  const initialize = async () => {
-    await getHomesByUser();
+  const refresh = async () => {
+    getHomesByUser();
+  };
+
+  useEffect(() => {
+    refresh();
+  }, []);
+
+  useEffect(() => {
+    if (errorMessage) {
+      ToastService.error("Error", errorMessage);
+    }
+  }, [errorMessage]);
+
+  useEffect(() => {
     if (homesByUser?.length === 0) return;
     console.log({ homesByUser });
     const adminHomes = homesByUser?.filter((h) => h.isAdmin);
@@ -24,35 +50,63 @@ export default function ManageHomesScreen() {
 
     setHomesAdmin(adminHomes ?? []);
     setHomesMember(memberHomes ?? []);
-  };
-
-  useEffect(() => {
-    getHomesByUser();
-    initialize();
-  }, []);
-
-  const handleCreateHome = (homeName: string) => {
-    console.log("Nombre del hogar:", homeName);
-    ToastService.success("Hogar creado", `Has creado: ${homeName}`);
-  };
+  }, [homesByUser]);
 
   return (
     <>
-      <MotiViewCustom style={globalStyles.container}>
-        <ScrollView
-          style={{
-            flex: 1,
-            width: "100%",
-            backgroundColor: "blue",
-          }}
-        >
-          <Link href="/(home)/(modals)/create-home" push asChild>
-            <AnimatedButtonCustom label="Crear hogar" onPress={() => {}} />
-          </Link>
-        </ScrollView>
-      </MotiViewCustom>
+      {isLoading ? (
+        <Loader />
+      ) : (
+        <MotiViewCustom style={globalStyles.container}>
+          <ScrollView
+            refreshControl={
+              <RefreshControl
+                refreshing={isLoading}
+                onRefresh={async () => {
+                  refresh();
+                }}
+              />
+            }
+            contentContainerStyle={styles.scrollContainer}
+            bounces={false}
+            style={{
+              flex: 1,
+              width: "100%",
+              height: "90%",
+            }}
+          >
+            <Link href="/(home)/(modals)/create-home" asChild>
+              <AnimatedButtonCustom label="Crear hogar" onPress={() => {}} />
+            </Link>
+
+            {homesAdmin.length > 0 && (
+              <HomeDisplay
+                homes={homesAdmin}
+                icon={
+                  <FontAwesome6 name="house-user" size={24} color="black" />
+                }
+                title="Hogares propietario"
+                roll="admin"
+              />
+            )}
+            {homesMember.length > 0 && (
+              <HomeDisplay
+                homes={homesMember}
+                icon={<Entypo name="home" size={24} color="black" />}
+                title="Hogares invitado"
+                roll="member"
+              />
+            )}
+          </ScrollView>
+        </MotiViewCustom>
+      )}
     </>
   );
 }
 
-const styles = StyleSheet.create({});
+const styles = StyleSheet.create({
+  scrollContainer: {
+    alignItems: "center",
+    justifyContent: "center",
+  },
+});

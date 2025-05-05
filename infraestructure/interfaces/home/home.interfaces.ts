@@ -2,8 +2,10 @@ export interface CreateHomeResponse {
   home: Home;
 }
 
+export type RolHome = "admin" | "member";
+
 export interface GetHomeByUserResponse {
-  home: HomesByUser;
+  homes: HomesByUser[];
 }
 
 export interface Home {
@@ -13,5 +15,22 @@ export interface Home {
 }
 
 export interface HomesByUser extends Home {
+  isAdmin: boolean;
+}
+
+export interface HomeDetails extends Home {
+  members: Member[];
+}
+
+export interface GetHomeDetails {
+  home: HomeDetails;
+}
+
+export interface Member {
+  userId: number;
+  memberId: number;
+  name: string;
+  email: string;
+  avatar: string;
   isAdmin: boolean;
 }
