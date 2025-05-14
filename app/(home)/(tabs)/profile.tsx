@@ -78,6 +78,8 @@ export default function ProfileScreen() {
     const formData = new FormData();
     formData.append("updateUserDto", JSON.stringify(data));
 
+    console.log({ data });
+
     if (profileImage) {
       const fileName = profileImage.split("/").pop();
       formData.append("image", {

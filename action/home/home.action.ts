@@ -2,6 +2,7 @@ import { hogarPlusApi } from "../../config/api/hogarPlusApi";
 import { GlobalApiResponse } from "../../infraestructure/interfaces/global/global-api-response";
 import {
   CreateHomeResponse,
+  DeleteHomeResponse,
   GetHomeByUserResponse,
   GetHomeDetails,
   HomesByUser,
@@ -30,5 +31,25 @@ export const getHomeDetails = async (
 ): Promise<GlobalApiResponse<GetHomeDetails> | null> => {
   return handleApiCall(() =>
     hogarPlusApi.get<GlobalApiResponse<GetHomeDetails>>(`/home/${homeId}`)
+  );
+};
+
+export const deleteHome = async (
+  homeId: number
+): Promise<GlobalApiResponse<DeleteHomeResponse> | null> => {
+  return handleApiCall(() =>
+    hogarPlusApi.delete<GlobalApiResponse<DeleteHomeResponse>>(
+      `/home/${homeId}`
+    )
+  );
+};
+
+export const exitFromHome = async (
+  homeId: number
+): Promise<GlobalApiResponse<DeleteHomeResponse> | null> => {
+  return handleApiCall(() =>
+    hogarPlusApi.delete<GlobalApiResponse<DeleteHomeResponse>>(
+      `/home/exit/${homeId}`
+    )
   );
 };

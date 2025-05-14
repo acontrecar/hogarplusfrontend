@@ -44,7 +44,6 @@ export default function ManageHomesScreen() {
 
   useEffect(() => {
     if (homesByUser?.length === 0) return;
-    console.log({ homesByUser });
     const adminHomes = homesByUser?.filter((h) => h.isAdmin);
     const memberHomes = homesByUser?.filter((h) => !h.isAdmin);
 
@@ -67,12 +66,14 @@ export default function ManageHomesScreen() {
                 }}
               />
             }
+            showsVerticalScrollIndicator={false}
             contentContainerStyle={styles.scrollContainer}
             bounces={false}
             style={{
               flex: 1,
               width: "100%",
-              height: "90%",
+              height: "100%",
+              marginBottom: 70,
             }}
           >
             <Link href="/(home)/(modals)/create-home" asChild>

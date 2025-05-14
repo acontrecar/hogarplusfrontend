@@ -34,7 +34,6 @@ export default function CreateHomeModal() {
 
   const handleCreate = async () => {
     if (!isValidInput) return;
-    console.log("Nombre del hogar:", homeName);
     setIsSubmitting(true);
 
     const success = await createHome(homeName.trim());

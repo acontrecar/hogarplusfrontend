@@ -1,4 +1,5 @@
 import { create } from "zustand";
+import { deleteHome, exitFromHome } from "../action/home/home.action";
 import {
   createHome,
   getHomeDetails,
@@ -14,19 +15,23 @@ interface HomeState {
   isLoading: boolean;
   homeCreated?: Home;
   homesByUser?: HomesByUser[];
-  homeDetails?: HomeDetails;
+  homeDetails: Record<number, HomeDetails>;
   homes?: Home[];
+  idHomeToDelete?: number;
   errorMessage?: string;
   createHome: (homeName: string) => Promise<boolean>;
   getHomesByUser: () => Promise<boolean>;
   getHomeDetails: (homeId: number) => Promise<boolean>;
+  deleteHome: (homeId: number) => Promise<boolean>;
+  exitFromHome: (homeId: number) => Promise<boolean>;
 }
 
-export const useHomeStore = create<HomeState>((set) => ({
+export const useHomeStore = create<HomeState>((set, get) => ({
   isLoading: false,
   homeCreated: undefined,
   homesByUser: [],
-  homeDetails: undefined,
+  idHomeToDelete: undefined,
+  homeDetails: {},
   homes: [],
   createHome: async (homeName: string) => {
     const resp = await createHome(homeName);
@@ -41,7 +46,17 @@ export const useHomeStore = create<HomeState>((set) => ({
       return false;
     }
 
-    set({ homeCreated: resp.data.home });
+    const homeByUser: HomesByUser = {
+      id: resp.data.home.id,
+      name: resp.data.home.name,
+      isAdmin: true,
+      invitationCode: resp.data.home.invitationCode,
+    };
+
+    set((state) => ({
+      homeCreated: resp.data.home,
+      homesByUser: state.homesByUser?.concat(homeByUser),
+    }));
     return true;
   },
   getHomesByUser: async () => {
@@ -74,7 +89,66 @@ export const useHomeStore = create<HomeState>((set) => ({
       return false;
     }
 
-    set({ homeDetails: resp.data.home });
+    set((state) => ({
+      homeDetails: {
+        ...state.homeDetails,
+        [homeId]: resp.data.home,
+      },
+    }));
+    return true;
+  },
+  deleteHome: async (homeId: number) => {
+    set({ isLoading: true });
+
+    const resp = await deleteHome(homeId);
+
+    if (!resp) {
+      set({ errorMessage: "Error inesperado", isLoading: false });
+      return false;
+    }
+
+    if (!resp.ok) {
+      set({ errorMessage: resp.message, isLoading: false });
+      return false;
+    }
+
+    set((state) => ({
+      homesByUser: state.homesByUser?.filter((h) => h.id !== homeId),
+      homeDetails: Object.fromEntries(
+        Object.entries(state.homeDetails).filter(
+          ([key]) => Number(key) !== homeId
+        )
+      ),
+      isLoading: false,
+      idHomeToDelete: undefined,
+    }));
+    return true;
+  },
+  exitFromHome: async (homeId: number) => {
+    set({ isLoading: true });
+
+    const resp = await exitFromHome(homeId);
+
+    if (!resp) {
+      set({ errorMessage: "Error inesperado", isLoading: false });
+      return false;
+    }
+
+    if (!resp.ok) {
+      set({ errorMessage: resp.message, isLoading: false });
+      return false;
+    }
+
+    set((state) => ({
+      homesByUser: state.homesByUser?.filter((h) => h.id !== homeId),
+      homeDetails: Object.fromEntries(
+        Object.entries(state.homeDetails).filter(
+          ([key]) => Number(key) !== homeId
+        )
+      ),
+      isLoading: false,
+      idHomeToDelete: undefined,
+    }));
     return true;
   },
 }));

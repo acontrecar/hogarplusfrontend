@@ -26,6 +26,10 @@ export interface GetHomeDetails {
   home: HomeDetails;
 }
 
+export interface DeleteHomeResponse {
+  message: string;
+}
+
 export interface Member {
   userId: number;
   memberId: number;

@@ -1,24 +1,19 @@
-import React, { useState } from "react";
-import {
-  Button,
-  Image,
-  StyleSheet,
-  Text,
-  TouchableOpacity,
-  View,
-} from "react-native";
+import React, { useEffect, useState } from "react";
+import { Alert, Image, StyleSheet, Text, View } from "react-native";
 import colors from "../../constants/colors";
 import {
   Home,
   RolHome,
 } from "../../infraestructure/interfaces/home/home.interfaces";
-import { AnimatePresence, MotiView } from "moti";
 import Animated, { FadeIn } from "react-native-reanimated";
 import { AnimatedButtonCustom } from "./AnimatedButtonCustom";
 import { useHomeStore } from "../../store/useHomeStore";
 import { FontAwesome } from "@expo/vector-icons";
 import Feather from "@expo/vector-icons/Feather";
 import { useAuthStore } from "../../store/useAuthStore";
+import * as Clipboard from "expo-clipboard";
+import ToastService from "../../services/ToastService";
+import { Link, useRouter } from "expo-router";
 
 interface HomeCardProps {
   home: Home;
@@ -27,16 +22,79 @@ interface HomeCardProps {
 
 export const HomeCard = ({ home, roll }: HomeCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
-
-  const { homeDetails, getHomeDetails } = useHomeStore();
+  const router = useRouter();
+  const { homeDetails, isLoading, getHomeDetails, deleteHome, exitFromHome } =
+    useHomeStore();
   const { user } = useAuthStore();
+  const details = homeDetails[home.id];
+
+  const copyInvitationCode = () => {
+    if (home.invitationCode) {
+      Clipboard.setStringAsync(home.invitationCode);
+      ToastService.success(
+        "Código copiado",
+        "El código de invitación copiado."
+      );
+    }
+  };
+
+  const onExitHome = () => {
+    Alert.alert("¿Salir del hogar?", "¿Estás seguro de que quieres salir?", [
+      {
+        text: "Cancelar",
+        style: "cancel",
+      },
+      {
+        text: "Aceptar",
+        style: "destructive",
+        onPress: async () => {
+          await exitHome(details.id);
+        },
+      },
+    ]);
+  };
+
+  const exitHome = async (homeId: number) => {
+    const success = await exitFromHome(homeId);
+
+    if (success) {
+      ToastService.success(
+        "Salida realizada",
+        "Has salido del hogar correctamente"
+      );
+    } else {
+      ToastService.error("Error al salir", "No se ha podido salir del hogar");
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      useHomeStore.setState({ homeDetails: {} });
+    };
+  }, []);
 
   const toggleExpanded = async () => {
-    if (!isExpanded) {
+    if (!isExpanded && !details) {
       await getHomeDetails(home.id);
     }
 
     setIsExpanded((prev) => !prev);
+  };
+
+  const deleteButton = async () => {
+    if (home.id) {
+      await deleteHome(home.id);
+    }
+  };
+
+  const handleDelete = () => {
+    router.push({
+      pathname: "/(home)/(modals)/confirm",
+      params: {
+        title: home.name,
+        homeId: home.id.toString(),
+      },
+    });
   };
 
   return (
@@ -57,11 +115,11 @@ export const HomeCard = ({ home, roll }: HomeCardProps) => {
         <Text style={styles.title}>{home.name}</Text>
       </View>
 
-      {isExpanded && homeDetails && (
+      {isExpanded && details && (
         <Animated.View entering={FadeIn}>
-          {homeDetails.members.length > 0 && (
+          {details.members.length > 0 && (
             <View style={styles.expandContainer}>
-              {homeDetails.members.map((member) => (
+              {details.members.map((member) => (
                 <View key={member.userId} style={styles.memberItem}>
                   <View>
                     {member.avatar ? (
@@ -76,35 +134,49 @@ export const HomeCard = ({ home, roll }: HomeCardProps) => {
                     )}
                   </View>
 
-                  <Text style={styles.memberText}>
+                  <Text numberOfLines={1} style={styles.memberText}>
                     {member.name}
-                    {member.email === user?.email && " (Tu) "}
+                    {member.email === user?.email && " (Tú) "}
                   </Text>
 
-                  {roll === "admin" ? (
+                  {roll === "admin" && member.email !== user?.email ? (
                     <Feather name="trash-2" size={20} color="black" />
                   ) : (
                     <View></View>
                   )}
                 </View>
               ))}
-              <View style={styles.buttonRow}>
+              <View style={[styles.buttonRow]}>
                 <AnimatedButtonCustom
                   customStyles={styles.acceptButton}
-                  onPress={() => {}}
+                  onPress={copyInvitationCode}
                   label="Copiar enlace"
-                  //   disabled={!isValidInput || isSubmitting}
+                  disabled={isLoading}
                 />
-                <AnimatedButtonCustom
-                  customStyles={styles.closeButton}
-                  onPress={() => {}}
-                  label="Eliminar"
-                  labelStyle={styles.closeText}
-                />
+                {roll === "admin" && (
+                  // <Link href="/(home)/(modals)/confirm" asChild>
+                  <AnimatedButtonCustom
+                    customStyles={styles.closeButton}
+                    // onPress={deleteButton}
+                    onPress={handleDelete}
+                    label="Eliminar"
+                    labelStyle={styles.closeText}
+                  />
+                  // </Link>
+                )}
+                {roll === "member" && (
+                  <AnimatedButtonCustom
+                    customStyles={styles.closeButton}
+                    // onPress={deleteButton}
+                    onPress={onExitHome}
+                    label="Salir"
+                    labelStyle={styles.closeText}
+                  />
+                )}
               </View>
             </View>
           )}
-          {homeDetails.members.length === 0 && (
+          {details.members.length === 0 && (
             <Text style={styles.noMembers}>No hay miembros en este hogar</Text>
           )}
         </Animated.View>
@@ -122,28 +194,30 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
   },
   closeButton: {
-    marginTop: 20,
-    width: "40%",
-    padding: 5,
+    width: "50%",
     backgroundColor: colors.accentRed,
-    borderRadius: 8,
+    borderRadius: 20,
+    justifyContent: "center",
     alignItems: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
   },
   closeText: {
-    color: "white",
     fontWeight: "bold",
   },
   acceptButton: {
-    width: "40%",
-    marginTop: 20,
-    padding: 5,
+    width: "50%",
     backgroundColor: colors.primaryLight,
-    borderRadius: 8,
+    borderRadius: 20,
+    justifyContent: "center",
     alignItems: "center",
+    paddingVertical: 10,
+    paddingHorizontal: 20,
   },
   buttonRow: {
     flexDirection: "row",
     justifyContent: "space-between",
+    width: "100%",
   },
   avatarPlaceholder: {
     width: 40,

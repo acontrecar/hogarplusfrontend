@@ -18,6 +18,28 @@ export default function HomeLayout() {
           }}
         />
         <Stack.Screen
+          name="(modals)/confirm"
+          options={{
+            presentation: "transparentModal",
+            animation: "fade",
+            // presentation: "modal",
+            headerShown: false,
+            gestureEnabled: true,
+            // animation: "slide_from_bottom",
+          }}
+        />
+        <Stack.Screen
+          name="(modals)/modalOutHome"
+          options={{
+            presentation: "transparentModal",
+            animation: "fade",
+            // presentation: "modal",
+            headerShown: false,
+            gestureEnabled: true,
+            // animation: "slide_from_bottom",
+          }}
+        />
+        <Stack.Screen
           name="manage-homes"
           options={{
             title: "Gestionar Viviendas",
