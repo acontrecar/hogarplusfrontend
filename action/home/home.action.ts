@@ -44,12 +44,33 @@ export const deleteHome = async (
   );
 };
 
+export const deletePersonFromHome = async (
+  homeId: number,
+  memberId: number
+): Promise<GlobalApiResponse<DeleteHomeResponse> | null> => {
+  return handleApiCall(() =>
+    hogarPlusApi.delete<GlobalApiResponse<DeleteHomeResponse>>(
+      `/home/${homeId}/person/${memberId}`
+    )
+  );
+};
+
 export const exitFromHome = async (
   homeId: number
 ): Promise<GlobalApiResponse<DeleteHomeResponse> | null> => {
   return handleApiCall(() =>
     hogarPlusApi.delete<GlobalApiResponse<DeleteHomeResponse>>(
       `/home/exit/${homeId}`
+    )
+  );
+};
+
+export const joinHome = async (
+  invitationCode: string
+): Promise<GlobalApiResponse<DeleteHomeResponse> | null> => {
+  return handleApiCall(() =>
+    hogarPlusApi.post<GlobalApiResponse<DeleteHomeResponse>>(
+      `/home/join/${invitationCode}`
     )
   );
 };

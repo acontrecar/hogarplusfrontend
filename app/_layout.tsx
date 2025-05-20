@@ -12,14 +12,15 @@ export default function RootLayout() {
     <AuthProvider>
       {/* <QueryProvider> */}
       <SafeAreaProvider>
-        <SafeAreaView
+        {/* <SafeAreaView
           style={{
             flex: 1,
           }}
-        >
-          <Stack screenOptions={{ headerShown: false }}></Stack>
-          <Toast config={toastConfig} />
-        </SafeAreaView>
+        > */}
+        {/* <Stack screenOptions={{ headerShown: false }}></Stack> */}
+        <Slot />
+        <Toast config={toastConfig} />
+        {/* </SafeAreaView> */}
       </SafeAreaProvider>
       {/* </QueryProvider> */}
     </AuthProvider>

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Alert, Image, StyleSheet, Text, View } from "react-native";
+import { Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
 import colors from "../../constants/colors";
 import {
   Home,
@@ -23,14 +23,20 @@ interface HomeCardProps {
 export const HomeCard = ({ home, roll }: HomeCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const router = useRouter();
-  const { homeDetails, isLoading, getHomeDetails, deleteHome, exitFromHome } =
-    useHomeStore();
+  const {
+    homeDetails,
+    isLoading,
+    getHomeDetails,
+    deleteHome,
+    exitFromHome,
+    deletePersonFromHome,
+  } = useHomeStore();
   const { user } = useAuthStore();
   const details = homeDetails[home.id];
 
   const copyInvitationCode = () => {
     if (home.invitationCode) {
-      Clipboard.setStringAsync(home.invitationCode);
+      Clipboard.setStringAsync(`hogarplus://join-home/${home.invitationCode}`);
       ToastService.success(
         "Código copiado",
         "El código de invitación copiado."
@@ -54,6 +60,26 @@ export const HomeCard = ({ home, roll }: HomeCardProps) => {
     ]);
   };
 
+  const onDeletePerson = (memberId: number) => {
+    Alert.alert(
+      "¿Eliminar al usuario?",
+      "¿Estás seguro de que quieres eliminar?",
+      [
+        {
+          text: "Cancelar",
+          style: "cancel",
+        },
+        {
+          text: "Aceptar",
+          style: "destructive",
+          onPress: async () => {
+            await deletePerson(details.id, memberId);
+          },
+        },
+      ]
+    );
+  };
+
   const exitHome = async (homeId: number) => {
     const success = await exitFromHome(homeId);
 
@@ -67,9 +93,26 @@ export const HomeCard = ({ home, roll }: HomeCardProps) => {
     }
   };
 
+  const deletePerson = async (homeId: number, memberId: number) => {
+    console.log({ homeId, memberId });
+    const success = await deletePersonFromHome(homeId, memberId);
+
+    if (success) {
+      ToastService.success(
+        "Usuario eliminado",
+        "Has eliminado al usuario correctamente"
+      );
+    } else {
+      ToastService.error(
+        "Error al eliminar",
+        "No se ha podido eliminar al usuario"
+      );
+    }
+  };
+
   useEffect(() => {
     return () => {
-      useHomeStore.setState({ homeDetails: {} });
+      useHomeStore.setState({ homeDetails: {}, homesByUser: [] });
     };
   }, []);
 
@@ -140,7 +183,9 @@ export const HomeCard = ({ home, roll }: HomeCardProps) => {
                   </Text>
 
                   {roll === "admin" && member.email !== user?.email ? (
-                    <Feather name="trash-2" size={20} color="black" />
+                    <Pressable onPress={() => onDeletePerson(member.memberId)}>
+                      <Feather name="trash-2" size={20} color="black" />
+                    </Pressable>
                   ) : (
                     <View></View>
                   )}

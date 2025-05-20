@@ -1,5 +1,10 @@
 import { create } from "zustand";
-import { deleteHome, exitFromHome } from "../action/home/home.action";
+import {
+  deleteHome,
+  exitFromHome,
+  deletePersonFromHome,
+  joinHome,
+} from "../action/home/home.action";
 import {
   createHome,
   getHomeDetails,
@@ -24,6 +29,8 @@ interface HomeState {
   getHomeDetails: (homeId: number) => Promise<boolean>;
   deleteHome: (homeId: number) => Promise<boolean>;
   exitFromHome: (homeId: number) => Promise<boolean>;
+  deletePersonFromHome: (homeId: number, memberId: number) => Promise<boolean>;
+  joinPersonToHome: (invitationCode: string) => Promise<boolean>;
 }
 
 export const useHomeStore = create<HomeState>((set, get) => ({
@@ -56,6 +63,7 @@ export const useHomeStore = create<HomeState>((set, get) => ({
     set((state) => ({
       homeCreated: resp.data.home,
       homesByUser: state.homesByUser?.concat(homeByUser),
+      errorMessage: undefined,
     }));
     return true;
   },
@@ -73,7 +81,11 @@ export const useHomeStore = create<HomeState>((set, get) => ({
       return false;
     }
 
-    set({ homesByUser: resp.data.homes, isLoading: false });
+    set({
+      homesByUser: resp.data.homes,
+      isLoading: false,
+      errorMessage: undefined,
+    });
     return true;
   },
   getHomeDetails: async (homeId: number) => {
@@ -94,6 +106,7 @@ export const useHomeStore = create<HomeState>((set, get) => ({
         ...state.homeDetails,
         [homeId]: resp.data.home,
       },
+      errorMessage: undefined,
     }));
     return true;
   },
@@ -120,6 +133,7 @@ export const useHomeStore = create<HomeState>((set, get) => ({
         )
       ),
       isLoading: false,
+      errorMessage: undefined,
       idHomeToDelete: undefined,
     }));
     return true;
@@ -146,6 +160,59 @@ export const useHomeStore = create<HomeState>((set, get) => ({
           ([key]) => Number(key) !== homeId
         )
       ),
+      isLoading: false,
+      errorMessage: undefined,
+      idHomeToDelete: undefined,
+    }));
+    return true;
+  },
+
+  deletePersonFromHome: async (homeId: number, memberId: number) => {
+    set({ isLoading: true });
+
+    const resp = await deletePersonFromHome(homeId, memberId);
+
+    if (!resp) {
+      set({ errorMessage: "Error inesperado", isLoading: false });
+      return false;
+    }
+
+    if (!resp.ok) {
+      set({ errorMessage: resp.message, isLoading: false });
+      return false;
+    }
+
+    set((state) => ({
+      homesByUser: state.homesByUser?.filter((h) => h.id !== homeId),
+      homeDetails: Object.fromEntries(
+        Object.entries(state.homeDetails).filter(
+          ([key]) => Number(key) !== homeId
+        )
+      ),
+      errorMessage: undefined,
+      isLoading: false,
+      idHomeToDelete: undefined,
+    }));
+    return true;
+  },
+
+  joinPersonToHome: async (invitationCode: string) => {
+    set({ isLoading: true });
+
+    const resp = await joinHome(invitationCode);
+
+    if (!resp) {
+      set({ errorMessage: "Error inesperado", isLoading: false });
+      return false;
+    }
+
+    if (!resp.ok) {
+      set({ errorMessage: resp.message, isLoading: false });
+      return false;
+    }
+
+    set((state) => ({
+      errorMessage: undefined,
       isLoading: false,
       idHomeToDelete: undefined,
     }));
