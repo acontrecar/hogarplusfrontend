@@ -36,7 +36,7 @@ export const HomeCard = ({ home, roll }: HomeCardProps) => {
 
   const copyInvitationCode = () => {
     if (home.invitationCode) {
-      Clipboard.setStringAsync(`hogarplus://join-home/${home.invitationCode}`);
+      Clipboard.setStringAsync(home.invitationCode);
       ToastService.success(
         "Código copiado",
         "El código de invitación copiado."

@@ -40,6 +40,15 @@ export default function HomeLayout() {
           }}
         />
         <Stack.Screen
+          name="(modals)/search-home"
+          options={{
+            presentation: "transparentModal",
+            animation: "fade",
+            headerShown: false,
+            gestureEnabled: true,
+          }}
+        />
+        <Stack.Screen
           name="manage-homes"
           options={{
             title: "Gestionar Viviendas",

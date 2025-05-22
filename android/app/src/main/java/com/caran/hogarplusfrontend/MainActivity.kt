@@ -1,4 +1,4 @@
-package com.caran.hogarplus
+package com.caran.hogarplusfrontend
 
 import android.os.Build
 import android.os.Bundle

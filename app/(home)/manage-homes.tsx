@@ -76,9 +76,28 @@ export default function ManageHomesScreen() {
               marginBottom: 70,
             }}
           >
-            <Link href="/(home)/(modals)/create-home" asChild>
-              <AnimatedButtonCustom label="Crear hogar" onPress={() => {}} />
-            </Link>
+            <View
+              style={{ flexDirection: "row", justifyContent: "space-between" }}
+            >
+              <Link href="/(home)/(modals)/create-home" asChild>
+                <AnimatedButtonCustom
+                  customStyles={{ width: "45%" }}
+                  label="Crear hogar"
+                  onPress={() => {}}
+                />
+              </Link>
+
+              <Link href="/(home)/(modals)/search-home" asChild>
+                <AnimatedButtonCustom
+                  customStyles={{
+                    width: "45%",
+                    backgroundColor: colors.infoBlue,
+                  }}
+                  label="Buscar hogar"
+                  onPress={() => {}}
+                />
+              </Link>
+            </View>
 
             {homesAdmin.length > 0 && (
               <HomeDisplay

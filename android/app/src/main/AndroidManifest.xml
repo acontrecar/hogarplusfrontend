@@ -27,13 +27,7 @@
         <category android:name="android.intent.category.DEFAULT"/>
         <category android:name="android.intent.category.BROWSABLE"/>
         <data android:scheme="hogarplus"/>
-        <data android:scheme="com.caran.hogarplus"/>
-      </intent-filter>
-      <intent-filter data-generated="true">
-        <action android:name="android.intent.action.VIEW"/>
-        <data android:scheme="hogarplus" android:host="*" android:pathPrefix="/"/>
-        <category android:name="android.intent.category.BROWSABLE"/>
-        <category android:name="android.intent.category.DEFAULT"/>
+        <data android:scheme="com.caran.hogarplusfrontend"/>
       </intent-filter>
     </activity>
   </application>
