@@ -49,6 +49,15 @@ export default function HomeLayout() {
           }}
         />
         <Stack.Screen
+          name="(modals)/create-task"
+          options={{
+            presentation: "card",
+            animation: "fade",
+            headerShown: true,
+            gestureEnabled: true,
+          }}
+        />
+        <Stack.Screen
           name="manage-homes"
           options={{
             title: "Gestionar Viviendas",

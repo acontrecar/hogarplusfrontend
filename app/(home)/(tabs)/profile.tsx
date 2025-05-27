@@ -20,6 +20,9 @@ import { useRouter } from "expo-router";
 import { AnimatedButtonCustom } from "../../../ui/components/AnimatedButtonCustom";
 import { Controller, useForm } from "react-hook-form";
 import ToastService from "../../../services/ToastService";
+import { HomesDropDown } from "../../../ui/components/HomesDropDown";
+import { useHomeStore } from "../../../store/useHomeStore";
+import { HomeAndMembers } from "../../../infraestructure/interfaces/home/home.interfaces";
 
 type ProfileFormInputs = {
   name: string;
@@ -106,8 +109,17 @@ export default function ProfileScreen() {
     setIsSubmitting(false);
   };
 
+  const { housesAndMembers, getHomesAndMembers } = useHomeStore();
+  const [currentHouse, setCurrentHouse] = useState<HomeAndMembers | null>(null);
+
   return (
     <MotiViewCustom style={globalStyles.container}>
+      <HomesDropDown
+        currentHouse={currentHouse}
+        setCurrentHouse={setCurrentHouse}
+        getHomesAndMembers={getHomesAndMembers}
+        housesAndMembers={housesAndMembers}
+      />
       <TouchableOpacity onPress={handleSelectImage}>
         {profileImage ? (
           <Image source={{ uri: profileImage }} style={styles.avatar} />

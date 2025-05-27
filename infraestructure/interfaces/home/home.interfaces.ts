@@ -38,3 +38,38 @@ export interface Member {
   avatar: string;
   isAdmin: boolean;
 }
+
+export interface HomesAndMembers {
+  id: number;
+  name: string;
+  members: MemberOfHome[];
+}
+
+export interface MemberOfHome {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+}
+
+export interface GetHomesAndMembers {
+  homes: HomeAndMembers[];
+}
+
+export interface HomeAndMembers {
+  id: number;
+  name: string;
+  members: MemberOfHome[];
+}
+
+export interface Member {
+  id: number;
+  role: string;
+  createdAt: Date;
+}
+
+export interface Member {
+  id: number;
+  role: string;
+  createdAt: Date;
+}

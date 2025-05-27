@@ -59,6 +59,7 @@ export default function SearchHomeModal() {
           placeholderTextColor="#999"
           value={searchCode}
           onChangeText={setSearchCode}
+          autoFocus={true}
           autoCapitalize="none"
           autoCorrect={false}
         />

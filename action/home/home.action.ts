@@ -5,6 +5,8 @@ import {
   DeleteHomeResponse,
   GetHomeByUserResponse,
   GetHomeDetails,
+  GetHomesAndMembers,
+  HomesAndMembers,
   HomesByUser,
 } from "../../infraestructure/interfaces/home/home.interfaces";
 import { handleApiCall } from "../handleApiCall";
@@ -74,3 +76,10 @@ export const joinHome = async (
     )
   );
 };
+
+export const getHomesAndMembersByUser =
+  async (): Promise<GlobalApiResponse<GetHomesAndMembers> | null> => {
+    return handleApiCall(() =>
+      hogarPlusApi.get<GlobalApiResponse<GetHomesAndMembers>>(`/home/user/get`)
+    );
+  };
