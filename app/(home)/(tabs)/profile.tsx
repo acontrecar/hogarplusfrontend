@@ -109,17 +109,8 @@ export default function ProfileScreen() {
     setIsSubmitting(false);
   };
 
-  const { housesAndMembers, getHomesAndMembers } = useHomeStore();
-  const [currentHouse, setCurrentHouse] = useState<HomeAndMembers | null>(null);
-
   return (
     <MotiViewCustom style={globalStyles.container}>
-      <HomesDropDown
-        currentHouse={currentHouse}
-        setCurrentHouse={setCurrentHouse}
-        getHomesAndMembers={getHomesAndMembers}
-        housesAndMembers={housesAndMembers}
-      />
       <TouchableOpacity onPress={handleSelectImage}>
         {profileImage ? (
           <Image source={{ uri: profileImage }} style={styles.avatar} />

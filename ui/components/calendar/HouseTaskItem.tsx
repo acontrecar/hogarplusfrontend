@@ -6,11 +6,14 @@ import {
   Text,
   Animated,
 } from "react-native";
-import { HouseTask } from "../../../infraestructure/interfaces/calendar/calendar";
+import {
+  HouseTask,
+  Task,
+} from "../../../infraestructure/interfaces/calendar/calendar";
 import { useHousesStore } from "../../../store/useHousesStore";
 import { RectButton } from "react-native-gesture-handler";
 
-const HouseTaskItem = ({ task }: { task: HouseTask }) => {
+const HouseTaskItem = ({ task }: { task: Task }) => {
   //   const { users } = useUserStore();
   const { completeTask } = useHousesStore();
   const users = [
@@ -19,7 +22,10 @@ const HouseTaskItem = ({ task }: { task: HouseTask }) => {
       name: "Juan",
     },
   ];
-  const assignedUsers = users.filter((u) => task.assignedTo.includes(u.id));
+  const assignedUsers = task.assignedTo.map((u) => ({
+    id: u.id,
+    name: u.name,
+  }));
 
   const getPriorityColor = () => {
     switch (task.priority) {
@@ -35,7 +41,7 @@ const HouseTaskItem = ({ task }: { task: HouseTask }) => {
   return (
     <TouchableOpacity
       style={[styles.container, { borderLeftColor: getPriorityColor() }]}
-      onPress={() => completeTask(task.id)}
+      onPress={() => completeTask(task.id.toString())}
     >
       <View style={styles.content}>
         <Text style={styles.title}>{task.title}</Text>
@@ -60,6 +66,11 @@ const HouseTaskItem = ({ task }: { task: HouseTask }) => {
             ))}
           </View>
         )}
+
+        <View style={styles.assignees}>
+          <Text style={styles.assigneesLabel}>Creado por:</Text>
+          <Text style={styles.assignee}>{task.createdBy.name}</Text>
+        </View>
       </View>
 
       <View

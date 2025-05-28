@@ -15,11 +15,14 @@ import {
   ExpandableCalendar,
   LocaleConfig,
   WeekCalendar,
+  // Importar XDate si está disponible
+  // XDate,
 } from "react-native-calendars";
 import {
   AgendaSection,
   CalendarEvent,
   HouseTask,
+  Task,
 } from "../../../infraestructure/interfaces/calendar/calendar";
 import { agendaItems, getMarkedDates } from "../../../mocks/agendaTiems";
 import { getTheme, lightThemeColor, themeColor } from "../../../mocks/theme";
@@ -31,6 +34,9 @@ import { HomesDropDown } from "../../../ui/components/HomesDropDown";
 import { HomeAndMembers } from "../../../infraestructure/interfaces/home/home.interfaces";
 import { AnimatedButtonCustom } from "../../../ui/components/AnimatedButtonCustom";
 import { useRouter } from "expo-router";
+import { useTaskStore } from "../../../store/useTaskStore";
+import ToastService from "../../../services/ToastService";
+import Loader from "../../loader";
 
 LocaleConfig.locales["es"] = {
   monthNames: [
@@ -61,7 +67,7 @@ LocaleConfig.locales["es"] = {
 LocaleConfig.defaultLocale = "es";
 
 export default function CalendarScreen() {
-  const { tasks } = useHousesStore();
+  const { isLoading, errorMessage, tasks, getTasksByHouse } = useTaskStore();
   const { housesAndMembers, getHomesAndMembers } = useHomeStore();
   const calendarRef = useRef<any>(null);
   const rotation = useRef(new Animated.Value(0)).current;
@@ -69,27 +75,65 @@ export default function CalendarScreen() {
   const [currentDate, setCurrentDate] = useState(
     new Date().toISOString().split("T")[0]
   );
-  const [modalVisible, setModalVisible] = useState(false);
 
   const router = useRouter();
 
+  useEffect(() => {
+    if (errorMessage) {
+      ToastService.error("Error", errorMessage);
+    }
+  }, [errorMessage]);
+
+  const getTasks = async (houseId: string) => {
+    const success = await getTasksByHouse(houseId);
+
+    if (success) {
+      ToastService.success("Tareas actualizadas", "Tareas actualizadas");
+    } else {
+      ToastService.error("Error", "Error al actualizar tareas");
+    }
+  };
+
+  useEffect(() => {
+    if (currentHouse) {
+      getTasks(currentHouse.id.toString());
+    }
+  }, [currentHouse]);
+
+  useEffect(() => {
+    console.log("Tasks loaded:", JSON.stringify(tasks, null, 2));
+  }, [tasks]);
+
   // Generar secciones para AgendaList
   const getSections = (): AgendaSection[] => {
-    const grouped: { [key: string]: HouseTask[] } = {};
+    if (!tasks || tasks.length === 0) {
+      return [];
+    }
+
+    const grouped: { [key: string]: Task[] } = {};
 
     tasks.forEach((task) => {
-      if (!grouped[task.date]) grouped[task.date] = [];
+      console.log("Processing task:", JSON.stringify(task, null, 2));
+      if (!grouped[task.date]) {
+        grouped[task.date] = [];
+      }
       grouped[task.date].push(task);
     });
 
-    return Object.keys(grouped).map((date) => ({
-      title: date,
-      data: grouped[date],
-    }));
+    return Object.keys(grouped)
+      .sort() // Ordenar fechas
+      .map((date) => ({
+        title: date,
+        data: grouped[date],
+      }));
   };
 
   // Marcar fechas con tareas
-  const getMarkedDates = () => {
+  const getMarkedDatesForCalendar = () => {
+    if (!tasks || tasks.length === 0) {
+      return {};
+    }
+
     const marked: any = {};
     tasks.forEach((task) => {
       marked[task.date] = {
@@ -115,10 +159,12 @@ export default function CalendarScreen() {
   }, []);
 
   const onDateChanged = (date: string) => {
+    console.log("Date changed to:", date);
     setCurrentDate(date);
   };
 
-  const renderHeader = (date?: XDate) => {
+  // Cambiar el tipo para que sea compatible
+  const renderHeader = (date?: any) => {
     const rotate = rotation.interpolate({
       inputRange: [0, 1],
       outputRange: ["0deg", "180deg"],
@@ -126,8 +172,9 @@ export default function CalendarScreen() {
 
     return (
       <TouchableOpacity style={styles.header} onPress={toggleCalendar}>
-        {/* <Text style={styles.houseName}>{currentHouse?.name}</Text> */}
-        <Text style={styles.headerDate}>{date?.toString("MMMM yyyy")}</Text>
+        <Text style={styles.headerDate}>
+          {date?.toString ? date.toString("MMMM yyyy") : "Calendario"}
+        </Text>
         <Animated.View style={{ transform: [{ rotate }] }}>
           <Text style={styles.arrow}>▼</Text>
         </Animated.View>
@@ -135,9 +182,14 @@ export default function CalendarScreen() {
     );
   };
 
-  const renderItem = ({ item }: { item: HouseTask }) => (
+  // Cambiar el tipo para que sea compatible con Task
+  const renderItem = ({ item }: { item: Task }) => (
     <HouseTaskItem task={item} />
   );
+
+  if (isLoading) {
+    return <Loader />;
+  }
 
   return (
     <View style={styles.container}>
@@ -151,7 +203,12 @@ export default function CalendarScreen() {
       <AnimatedButtonCustom
         label={"+"}
         onPress={() => {
-          router.push("/(home)/(modals)/create-task");
+          router.push({
+            pathname: "/(home)/(modals)/create-task",
+            params: {
+              selectedDate: currentDate,
+            },
+          });
         }}
         customStyles={styles.buttonStyle}
         labelStyle={styles.labelStyle}
@@ -164,8 +221,7 @@ export default function CalendarScreen() {
         >
           <ExpandableCalendar
             ref={calendarRef}
-            // renderHeader={renderHeader}
-            markedDates={getMarkedDates()}
+            markedDates={getMarkedDatesForCalendar()}
             theme={{
               calendarBackground: "#fff",
               selectedDayBackgroundColor: "#4e73df",
@@ -177,32 +233,24 @@ export default function CalendarScreen() {
             }}
             firstDay={1} // Lunes como primer día
           />
-          <AgendaList
-            sections={getSections()}
-            renderItem={renderItem}
-            sectionStyle={styles.section}
-            dayFormat={"dd/MM/yyyy"}
-          />
+          {tasks && tasks.length > 0 ? (
+            <AgendaList
+              sections={getSections()}
+              renderItem={renderItem}
+              sectionStyle={styles.section}
+              dayFormat={"dd/MM/yyyy"}
+            />
+          ) : (
+            <View style={styles.emptyContainer}>
+              <Text style={styles.emptyText}>No hay tareas programadas</Text>
+            </View>
+          )}
         </CalendarProvider>
       ) : (
-        <Text>Seleccione un hogar...</Text>
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>Seleccione un hogar...</Text>
+        </View>
       )}
-      {/* {currentHouse && (
-        <CreateTaskModal
-          visible={modalVisible}
-          onClose={() => setModalVisible(false)}
-          onSubmit={(taskData) => {
-            // Aquí llama a tu función para crear la tarea
-            console.log("Nueva tarea:", taskData);
-            // Ejemplo: createTask(taskData);
-          }}
-          houseId={currentHouse.id}
-          members={currentHouse.members.map((m) => ({
-            id: m.id,
-            name: "POPO",
-          }))}
-        />
-      )} */}
     </View>
   );
 }
@@ -213,7 +261,6 @@ const styles = StyleSheet.create({
     backgroundColor: "#f7fafc",
     justifyContent: "center",
     alignItems: "center",
-    // height: "80%",
     marginBottom: 70,
   },
   header: {
@@ -260,5 +307,16 @@ const styles = StyleSheet.create({
   labelStyle: {
     color: "white",
     fontSize: 30,
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    padding: 20,
+  },
+  emptyText: {
+    fontSize: 16,
+    color: "#718096",
+    textAlign: "center",
   },
 });

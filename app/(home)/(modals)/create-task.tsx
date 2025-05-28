@@ -127,7 +127,6 @@ export default function CreateTaskModal() {
     if (selectedMember && !assignedMembers.includes(selectedMember.id)) {
       setAssignedMembers([...assignedMembers, selectedMember.id]);
       setSelectedMember(null);
-      // Limpiar error si existía
       if (errors.assignedMembers) {
         setErrors({ ...errors, assignedMembers: "" });
       }

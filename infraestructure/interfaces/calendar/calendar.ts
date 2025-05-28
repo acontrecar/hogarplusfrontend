@@ -26,7 +26,39 @@ export type HouseTask = {
   priority: "low" | "medium" | "high";
 };
 
+export interface Task {
+  id: number;
+  title: string;
+  description: string;
+  date: string;
+  time: string;
+  duration: string;
+  status: "pending" | "completed" | "overdue";
+  priority: "low" | "medium" | "high";
+  house: House;
+  assignedTo: CreatedBy[];
+  createdBy: CreatedBy;
+  createdAt: Date;
+}
+
+export interface GetTasksResponse {
+  tasks: Task[];
+}
+
+export interface CreatedBy {
+  id: number;
+  role: string;
+  createdAt: Date;
+  name: string;
+}
+
+export interface House {
+  id: number;
+  name: string;
+  invitationCode: string;
+}
+
 export type AgendaSection = {
   title: string;
-  data: HouseTask[];
+  data: Task[];
 };
