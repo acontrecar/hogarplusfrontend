@@ -11,17 +11,10 @@ import {
   Task,
 } from "../../../infraestructure/interfaces/calendar/calendar";
 import { useHousesStore } from "../../../store/useHousesStore";
-import { RectButton } from "react-native-gesture-handler";
 
 const HouseTaskItem = ({ task }: { task: Task }) => {
-  //   const { users } = useUserStore();
   const { completeTask } = useHousesStore();
-  const users = [
-    {
-      id: "user1",
-      name: "Juan",
-    },
-  ];
+
   const assignedUsers = task.assignedTo.map((u) => ({
     id: u.id,
     name: u.name,

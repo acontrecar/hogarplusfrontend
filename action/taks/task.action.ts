@@ -1,5 +1,9 @@
 import { hogarPlusApi } from "../../config/api/hogarPlusApi";
-import { GetTasksResponse } from "../../infraestructure/interfaces/calendar/calendar";
+import {
+  CreateTaskDto,
+  CreateTaskResponse,
+  GetTasksResponse,
+} from "../../infraestructure/interfaces/calendar/calendar";
 import { GlobalApiResponse } from "../../infraestructure/interfaces/global/global-api-response";
 import { DeleteHomeResponse } from "../../infraestructure/interfaces/home/home.interfaces";
 import { handleApiCall } from "../handleApiCall";
@@ -10,6 +14,17 @@ export const getTasksByHouse = async (
   return handleApiCall(() =>
     hogarPlusApi.get<GlobalApiResponse<GetTasksResponse>>(
       `/task/house/${houseId}`
+    )
+  );
+};
+
+export const createTaskAction = async (
+  createTask: CreateTaskDto
+): Promise<GlobalApiResponse<CreateTaskResponse> | null> => {
+  return handleApiCall(() =>
+    hogarPlusApi.post<GlobalApiResponse<CreateTaskResponse>>(
+      `/task`,
+      createTask
     )
   );
 };

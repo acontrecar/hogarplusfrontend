@@ -26,6 +26,17 @@ export type HouseTask = {
   priority: "low" | "medium" | "high";
 };
 
+export interface CreateTaskDto {
+  title: string;
+  description?: string;
+  date: Date;
+  time?: string;
+  duration?: string;
+  priority: "low" | "medium" | "high";
+  assignedTo: number[];
+  houseId: number;
+}
+
 export interface Task {
   id: number;
   title: string;
@@ -43,6 +54,10 @@ export interface Task {
 
 export interface GetTasksResponse {
   tasks: Task[];
+}
+
+export interface CreateTaskResponse {
+  task: Task;
 }
 
 export interface CreatedBy {

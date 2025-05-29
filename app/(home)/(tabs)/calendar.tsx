@@ -37,6 +37,8 @@ import { useRouter } from "expo-router";
 import { useTaskStore } from "../../../store/useTaskStore";
 import ToastService from "../../../services/ToastService";
 import Loader from "../../loader";
+import { useCalendarTasks } from "../../../hooks/useCalendarTasks";
+import colors from "../../../constants/colors";
 
 LocaleConfig.locales["es"] = {
   monthNames: [
@@ -77,7 +79,7 @@ export default function CalendarScreen() {
   );
 
   const router = useRouter();
-
+  const { tasksByDate, markedDates } = useCalendarTasks(tasks);
   useEffect(() => {
     if (errorMessage) {
       ToastService.error("Error", errorMessage);
@@ -106,47 +108,16 @@ export default function CalendarScreen() {
 
   // Generar secciones para AgendaList
   const getSections = (): AgendaSection[] => {
-    if (!tasks || tasks.length === 0) {
+    if (!tasksByDate || Object.keys(tasksByDate).length === 0) {
       return [];
     }
 
-    const grouped: { [key: string]: Task[] } = {};
-
-    tasks.forEach((task) => {
-      console.log("Processing task:", JSON.stringify(task, null, 2));
-      if (!grouped[task.date]) {
-        grouped[task.date] = [];
-      }
-      grouped[task.date].push(task);
-    });
-
-    return Object.keys(grouped)
+    return Object.keys(tasksByDate)
       .sort() // Ordenar fechas
       .map((date) => ({
         title: date,
-        data: grouped[date],
+        data: tasksByDate[date],
       }));
-  };
-
-  // Marcar fechas con tareas
-  const getMarkedDatesForCalendar = () => {
-    if (!tasks || tasks.length === 0) {
-      return {};
-    }
-
-    const marked: any = {};
-    tasks.forEach((task) => {
-      marked[task.date] = {
-        marked: true,
-        dotColor:
-          task.priority === "high"
-            ? "#e74c3c"
-            : task.priority === "medium"
-            ? "#f39c12"
-            : "#2ecc71",
-      };
-    });
-    return marked;
   };
 
   const toggleCalendar = useCallback(() => {
@@ -163,7 +134,6 @@ export default function CalendarScreen() {
     setCurrentDate(date);
   };
 
-  // Cambiar el tipo para que sea compatible
   const renderHeader = (date?: any) => {
     const rotate = rotation.interpolate({
       inputRange: [0, 1],
@@ -217,14 +187,16 @@ export default function CalendarScreen() {
       {currentHouse ? (
         <CalendarProvider
           date={currentDate}
+          // showTodayButton
+          disabledOpacity={0.6}
           onDateChanged={(date) => onDateChanged(date)}
         >
           <ExpandableCalendar
-            ref={calendarRef}
-            markedDates={getMarkedDatesForCalendar()}
+            // ref={calendarRef}
+            markedDates={markedDates}
             theme={{
               calendarBackground: "#fff",
-              selectedDayBackgroundColor: "#4e73df",
+              selectedDayBackgroundColor: colors.primary,
               selectedDayTextColor: "#fff",
               todayTextColor: "#4e73df",
               dayTextColor: "#2d3748",
@@ -233,7 +205,7 @@ export default function CalendarScreen() {
             }}
             firstDay={1} // Lunes como primer día
           />
-          {tasks && tasks.length > 0 ? (
+          {Object.keys(tasksByDate).length > 0 ? (
             <AgendaList
               sections={getSections()}
               renderItem={renderItem}
@@ -285,14 +257,14 @@ const styles = StyleSheet.create({
     color: "#4e73df",
   },
   section: {
-    backgroundColor: "#4e73df",
+    backgroundColor: "#83a679",
     color: "#fff",
     paddingVertical: 5,
     paddingLeft: 15,
   },
   buttonStyle: {
     alignItems: "center",
-    backgroundColor: "#0093D0",
+    backgroundColor: colors.primary,
     borderRadius: 100,
     bottom: 0,
     height: 75,

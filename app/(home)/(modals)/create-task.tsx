@@ -18,6 +18,9 @@ import { Dropdown } from "react-native-element-dropdown";
 import { useHomeStore } from "../../../store/useHomeStore";
 import { useHousesStore } from "../../../store/useHousesStore";
 import { MemberOfHome } from "../../../infraestructure/interfaces/home/home.interfaces";
+import colors from "../../../constants/colors";
+import { useTaskStore } from "../../../store/useTaskStore";
+import { CreateTaskDto } from "../../../infraestructure/interfaces/calendar/calendar";
 
 interface CreateTaskParams {
   selectedDate?: string;
@@ -42,9 +45,9 @@ const durationOptions = [
 
 export default function CreateTaskModal() {
   const navigation = useNavigation();
-  const params = useLocalSearchParams();
+  const params = useLocalSearchParams<{ selectedDate?: string }>();
   const { currentHome } = useHomeStore();
-  // const { createTask } = useHousesStore(); // Asumiendo que existe esta función
+  const { createTask } = useTaskStore();
 
   // Estados del formulario
   const [title, setTitle] = useState("");
@@ -54,7 +57,7 @@ export default function CreateTaskModal() {
   );
   const [selectedTime, setSelectedTime] = useState(new Date());
   const [duration, setDuration] = useState("30 min");
-  const [priority, setPriority] = useState("medium");
+  const [priority, setPriority] = useState<"low" | "medium" | "high">("medium");
   const [assignedMembers, setAssignedMembers] = useState<number[]>([]);
   const [selectedMember, setSelectedMember] = useState<MemberOfHome | null>(
     null
@@ -73,7 +76,7 @@ export default function CreateTaskModal() {
     navigation.setOptions({
       title: "Nueva Tarea",
       headerStyle: {
-        backgroundColor: "#4e73df",
+        backgroundColor: colors.primary,
       },
       headerTintColor: "#fff",
       headerTitleStyle: {
@@ -150,10 +153,11 @@ export default function CreateTaskModal() {
 
     setIsLoading(true);
 
-    const taskData = {
+    const taskData: CreateTaskDto = {
       title: title.trim(),
       description: description.trim(),
-      date: formatDate(selectedDate),
+      // date: formatDate(selectedDate),
+      date: selectedDate,
       time: formatTime(selectedTime),
       duration,
       priority,
@@ -161,24 +165,19 @@ export default function CreateTaskModal() {
       houseId: currentHome!.id,
     };
 
-    try {
-      console.log("Enviando tarea:", taskData);
+    const success = await createTask(taskData);
 
-      // Llamar a la función de creación (implementar según tu store)
-      // await createTask(taskData);
-
+    if (success) {
       Alert.alert("Éxito", "Tarea creada correctamente", [
         {
           text: "OK",
           onPress: () => router.back(),
         },
       ]);
-    } catch (error) {
-      console.error("Error creando tarea:", error);
+    } else {
       Alert.alert("Error", "No se pudo crear la tarea. Inténtalo de nuevo.");
-    } finally {
-      setIsLoading(false);
     }
+    setIsLoading(false);
   };
 
   const handleCancel = () => {
@@ -452,7 +451,7 @@ const styles = StyleSheet.create({
     paddingBottom: 100,
   },
   houseInfo: {
-    backgroundColor: "#e6fffa",
+    backgroundColor: colors.background,
     padding: 12,
     borderRadius: 8,
     marginBottom: 20,
@@ -543,7 +542,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   addButton: {
-    backgroundColor: "#4e73df",
+    backgroundColor: colors.primaryLight,
     borderRadius: 8,
     width: 48,
     height: 48,
@@ -627,7 +626,7 @@ const styles = StyleSheet.create({
   },
   createButton: {
     flex: 2,
-    backgroundColor: "#4e73df",
+    backgroundColor: colors.primary,
     borderRadius: 8,
     paddingVertical: 14,
     alignItems: "center",
