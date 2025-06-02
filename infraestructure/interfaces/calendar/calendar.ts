@@ -22,8 +22,8 @@ export type HouseTask = {
   duration?: string;
   assignedTo: string[];
   houseId: string;
-  status: "pending" | "completed" | "overdue";
-  priority: "low" | "medium" | "high";
+  status: 'pending' | 'completed' | 'overdue';
+  priority: 'low' | 'medium' | 'high';
 };
 
 export interface CreateTaskDto {
@@ -32,7 +32,7 @@ export interface CreateTaskDto {
   date: Date;
   time?: string;
   duration?: string;
-  priority: "low" | "medium" | "high";
+  priority: 'low' | 'medium' | 'high';
   assignedTo: number[];
   houseId: number;
 }
@@ -44,11 +44,12 @@ export interface Task {
   date: string;
   time: string;
   duration: string;
-  status: "pending" | "completed" | "overdue";
-  priority: "low" | "medium" | "high";
+  status: 'pending' | 'completed' | 'overdue';
+  priority: 'low' | 'medium' | 'high';
   house: House;
   assignedTo: CreatedBy[];
   createdBy: CreatedBy;
+  completedBy: CreatedBy[];
   createdAt: Date;
 }
 
@@ -60,11 +61,21 @@ export interface CreateTaskResponse {
   task: Task;
 }
 
+export interface CompleteTaskResponse {
+  task: Task;
+}
+
 export interface CreatedBy {
   id: number;
   role: string;
+  userId: number;
   createdAt: Date;
   name: string;
+}
+
+export interface DeleteTaskDto {
+  houseId: number;
+  taskId: number;
 }
 
 export interface House {

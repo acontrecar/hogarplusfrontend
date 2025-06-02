@@ -1,8 +1,8 @@
-import React, { useEffect, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
-import { Dropdown } from "react-native-element-dropdown";
-import { HomeAndMembers } from "../../infraestructure/interfaces/home/home.interfaces";
-import { useHomeStore } from "../../store/useHomeStore";
+import React, { useEffect, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import { Dropdown } from 'react-native-element-dropdown';
+import { HomeAndMembers } from '../../infraestructure/interfaces/home/home.interfaces';
+import { useHomeStore } from '../../store/useHomeStore';
 
 interface Props {
   getHomesAndMembers: () => Promise<boolean>;
@@ -12,12 +12,7 @@ interface Props {
   housesAndMembers: HomeAndMembers[] | undefined;
 }
 
-export const HomesDropDown = ({
-  getHomesAndMembers,
-  setCurrentHouse,
-  currentHouse,
-  housesAndMembers,
-}: Props) => {
+export const HomesDropDown = ({ getHomesAndMembers, setCurrentHouse, currentHouse, housesAndMembers }: Props) => {
   const [isFocus, setIsFocus] = useState(false);
 
   const { setCurrentHome } = useHomeStore();
@@ -25,7 +20,7 @@ export const HomesDropDown = ({
   const fetchHousesAndMembers = async () => {
     const resp = await getHomesAndMembers();
     if (!resp) {
-      console.error("Error fetching houses and members");
+      console.error('Error fetching houses and members');
       return;
     }
   };
@@ -36,11 +31,7 @@ export const HomesDropDown = ({
 
   const renderLabel = () => {
     if (currentHouse || isFocus) {
-      return (
-        <Text style={[styles.label, isFocus && { color: "blue" }]}>
-          Seleccione un hogar
-        </Text>
-      );
+      return <Text style={[styles.label, isFocus && { color: 'blue' }]}>Seleccione un hogar</Text>;
     }
     return null;
   };
@@ -51,21 +42,16 @@ export const HomesDropDown = ({
         <View style={styles.container}>
           {renderLabel()}
           <Dropdown
-            style={[
-              styles.dropdown,
-              isFocus && { borderColor: "blue" },
-              { width: 200 },
-            ]}
+            style={[styles.dropdown, isFocus && { borderColor: 'blue' }, { width: 200 }]}
             placeholderStyle={styles.placeholderStyle}
             selectedTextStyle={styles.selectedTextStyle}
             inputSearchStyle={styles.inputSearchStyle}
             iconStyle={styles.iconStyle}
             data={housesAndMembers}
-            search
             maxHeight={300}
             labelField="name"
             valueField="id"
-            placeholder={!isFocus ? "Selecciona el hogar" : "..."}
+            placeholder={!isFocus ? 'Selecciona el hogar' : '...'}
             searchPlaceholder="Search..."
             value={currentHouse}
             onFocus={() => setIsFocus(true)}
@@ -94,40 +80,40 @@ export const HomesDropDown = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: "white",
-    padding: 16,
+    backgroundColor: 'white',
+    padding: 16
   },
   dropdown: {
     height: 50,
-    borderColor: "gray",
+    borderColor: 'gray',
     borderWidth: 0.5,
     borderRadius: 8,
-    paddingHorizontal: 8,
+    paddingHorizontal: 8
   },
   icon: {
-    marginRight: 5,
+    marginRight: 5
   },
   label: {
-    position: "absolute",
-    backgroundColor: "white",
+    position: 'absolute',
+    backgroundColor: 'white',
     left: 22,
     top: 8,
     zIndex: 999,
     paddingHorizontal: 8,
-    fontSize: 14,
+    fontSize: 14
   },
   placeholderStyle: {
-    fontSize: 16,
+    fontSize: 16
   },
   selectedTextStyle: {
-    fontSize: 16,
+    fontSize: 16
   },
   iconStyle: {
     width: 20,
-    height: 20,
+    height: 20
   },
   inputSearchStyle: {
     height: 40,
-    fontSize: 16,
-  },
+    fontSize: 16
+  }
 });
