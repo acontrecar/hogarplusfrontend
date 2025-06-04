@@ -22,7 +22,7 @@ export default function ManageHomesScreen() {
   const { isLoading, homesByUser, errorMessage, getHomesByUser } = useHomeStore();
 
   const refresh = async () => {
-    getHomesByUser();
+    await getHomesByUser();
   };
 
   useEffect(() => {
@@ -55,7 +55,7 @@ export default function ManageHomesScreen() {
               <RefreshControl
                 refreshing={isLoading}
                 onRefresh={async () => {
-                  refresh();
+                  await refresh();
                 }}
               />
             }

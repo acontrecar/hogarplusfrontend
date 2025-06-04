@@ -58,21 +58,27 @@ export const useTaskStore = create<TaskState>(set => ({
   },
 
   deleteTask: async (deleteTaskDto: DeleteTaskDto) => {
-    set({ isLoading: true });
+    // set({ isLoading: true });
     const resp = await deleteTaskAction(deleteTaskDto);
 
     if (!resp) {
-      set({ errorMessage: 'Error inesperado', isLoading: false });
+      set({
+        errorMessage: 'Error inesperado'
+        //  isLoading: false
+      });
       return false;
     }
 
     if (!resp.ok) {
-      set({ errorMessage: resp.message, isLoading: false });
+      set({
+        errorMessage: resp.message
+        //  isLoading: false
+      });
       return false;
     }
 
     set(state => ({
-      isLoading: false,
+      // isLoading: false,
       errorMessage: undefined,
       tasks: state.tasks.filter(task => task.id !== deleteTaskDto.taskId)
     }));
@@ -80,21 +86,27 @@ export const useTaskStore = create<TaskState>(set => ({
     return true;
   },
   compleTask: async (taskId: string) => {
-    set({ isLoading: true });
+    // set({ isLoading: true });
     const resp = await completeTaskAction(taskId);
 
     if (!resp) {
-      set({ errorMessage: 'Error inesperado', isLoading: false });
+      set({
+        errorMessage: 'Error inesperado'
+        //  isLoading: false
+      });
       return false;
     }
 
     if (!resp.ok) {
-      set({ errorMessage: resp.message, isLoading: false });
+      set({
+        errorMessage: resp.message
+        // isLoading: false
+      });
       return false;
     }
 
     set(state => ({
-      isLoading: false,
+      // isLoading: false,
       errorMessage: undefined,
       tasks: state.tasks.map(task => (task.id === Number(taskId) ? resp.data.task : task))
     }));

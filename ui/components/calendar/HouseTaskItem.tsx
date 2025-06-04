@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { StyleSheet, View, TouchableOpacity, Text, Alert } from 'react-native';
 import { DeleteTaskDto, HouseTask, Task } from '../../../infraestructure/interfaces/calendar/calendar';
 import { useHousesStore } from '../../../store/useHousesStore';
@@ -15,6 +15,8 @@ const HouseTaskItem = ({ task }: { task: Task }) => {
   const { completeTask } = useHousesStore();
   const { user } = useAuthStore();
   const { deleteTask, compleTask } = useTaskStore();
+
+  const swipableRef = useRef<any>(null);
 
   const isAssignedToMe = task.assignedTo.some(u => u.userId === user?.id);
   const isCreatedByMe = task.createdBy.userId === user?.id;
@@ -46,7 +48,6 @@ const HouseTaskItem = ({ task }: { task: Task }) => {
   };
 
   const handleCompleteTask = () => {
-    // completeTask(task.id.toString());
     if (!isAssignedToMe) return;
 
     Alert.alert('Completar Tarea', '¿Estás seguro de que quieres marcar esta tarea como completada?', [
@@ -54,8 +55,9 @@ const HouseTaskItem = ({ task }: { task: Task }) => {
       {
         text: 'Completar',
         style: 'default',
-        onPress: () => {
-          onPressCompleteTask(task.id.toString());
+        onPress: async () => {
+          await onPressCompleteTask(task.id.toString());
+          swipableRef.current?.close();
         }
       }
     ]);
@@ -72,16 +74,16 @@ const HouseTaskItem = ({ task }: { task: Task }) => {
   };
 
   const handleDeleteTask = () => {
-    // Aquí iría tu función de desasignar
     if (!isCreatedByMe) return;
     Alert.alert('Eliminar Tarea', '¿Estás seguro de que quieres eliminar esta tarea?', [
       { text: 'Cancelar', style: 'cancel' },
       {
         text: 'Eliminar',
         style: 'default',
-        onPress: () => {
+        onPress: async () => {
           const deleteTaskDto: DeleteTaskDto = { houseId: task.house.id, taskId: task.id };
-          onPressDeleteTask(deleteTaskDto);
+          await onPressDeleteTask(deleteTaskDto);
+          swipableRef.current?.close();
         }
       }
     ]);
@@ -128,6 +130,7 @@ const HouseTaskItem = ({ task }: { task: Task }) => {
   return (
     <Swipeable
       renderRightActions={renderRightActions}
+      ref={swipableRef}
       rightThreshold={40}
       friction={2}
       enableTrackpadTwoFingerGesture

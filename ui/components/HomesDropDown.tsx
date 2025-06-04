@@ -80,7 +80,7 @@ export const HomesDropDown = ({ getHomesAndMembers, setCurrentHouse, currentHous
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: 'white',
+    backgroundColor: '#f7fafc',
     padding: 16
   },
   dropdown: {

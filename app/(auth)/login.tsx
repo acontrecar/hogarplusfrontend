@@ -1,12 +1,12 @@
-import { useForm, Controller } from "react-hook-form";
-import { useRouter } from "expo-router";
-import { Text, TextInput, Pressable, View } from "react-native";
-import { MotiViewCustom } from "../../ui/components/MotiViewCustom";
-import { authStyles } from "../../ui/styles/auth.styles";
-import { useAuthStore } from "../../store/useAuthStore";
-import { APP_ROUTES, AUTH_ROUTES } from "../../constants/routes";
-import { globalStyles } from "../../constants/styles";
-import { useState } from "react";
+import { useForm, Controller } from 'react-hook-form';
+import { useRouter } from 'expo-router';
+import { Text, TextInput, Pressable, View } from 'react-native';
+import { MotiViewCustom } from '../../ui/components/MotiViewCustom';
+import { authStyles } from '../../ui/styles/auth.styles';
+import { useAuthStore } from '../../store/useAuthStore';
+import { APP_ROUTES, AUTH_ROUTES } from '../../constants/routes';
+import { globalStyles } from '../../constants/styles';
+import { useState } from 'react';
 
 type LoginFormInputs = {
   email: string;
@@ -15,26 +15,27 @@ type LoginFormInputs = {
 
 export default function LoginScreen() {
   const router = useRouter();
-  const [errorApi, setErrorApi] = useState("");
+  const [errorApi, setErrorApi] = useState('');
   const { logIn, errorMessage } = useAuthStore();
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors }
   } = useForm<LoginFormInputs>({
     defaultValues: {
-      email: "antonio@example.com",
-      password: "supersegura123",
+      email: 'antonio@example.com',
+      // email: 'antonio@example4kfng.com',
+      password: 'supersegura123'
     },
-    mode: "onChange",
+    mode: 'onChange'
   });
 
   const onSubmit = async (data: LoginFormInputs) => {
-    setErrorApi("");
+    setErrorApi('');
     const { email, password } = data;
 
     if (email.trim().length === 0 || password.trim().length < 6) {
-      setErrorApi("El correo o la contraseña no puede estar vacío.");
+      setErrorApi('El correo o la contraseña no puede estar vacío.');
       return;
     }
 
@@ -43,7 +44,7 @@ export default function LoginScreen() {
     console.log({ success });
 
     if (!success) {
-      setErrorApi("Error al registrar.");
+      setErrorApi('Error al registrar.');
     } else {
       router.replace(APP_ROUTES.home);
     }
@@ -57,9 +58,7 @@ export default function LoginScreen() {
     <MotiViewCustom style={globalStyles.container}>
       <MotiViewCustom style={authStyles.header}>
         <Text style={authStyles.title}>HOGAR+</Text>
-        <Text style={authStyles.subtitle}>
-          Organización y armonía, todo en un solo lugar.
-        </Text>
+        <Text style={authStyles.subtitle}>Organización y armonía, todo en un solo lugar.</Text>
       </MotiViewCustom>
 
       {errorMessage && (
@@ -69,14 +68,13 @@ export default function LoginScreen() {
       )}
 
       <MotiViewCustom style={authStyles.toggleContainer}>
-        <Pressable
-          style={[authStyles.toggleButton, authStyles.toggleButtonActive]}
-        >
-          <Text style={[authStyles.toggleText, authStyles.toggleTextActive]}>
-            Inicio
-          </Text>
+        <Pressable style={[authStyles.toggleButton, authStyles.toggleButtonActive]}>
+          <Text style={[authStyles.toggleText, authStyles.toggleTextActive]}>Inicio</Text>
         </Pressable>
-        <Pressable style={authStyles.toggleButton} onPress={handleToRegister}>
+        <Pressable
+          style={authStyles.toggleButton}
+          onPress={handleToRegister}
+        >
           <Text style={authStyles.toggleText}>Registro</Text>
         </Pressable>
       </MotiViewCustom>
@@ -86,11 +84,11 @@ export default function LoginScreen() {
           control={control}
           name="email"
           rules={{
-            required: "El correo es obligatorio.",
+            required: 'El correo es obligatorio.',
             pattern: {
               value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-              message: "Correo inválido.",
-            },
+              message: 'Correo inválido.'
+            }
           }}
           render={({ field: { onChange, value } }) => (
             <TextInput
@@ -104,21 +102,17 @@ export default function LoginScreen() {
             />
           )}
         />
-        <MotiViewCustom>
-          {errors.email && (
-            <Text style={{ color: "red" }}>{errors.email.message}</Text>
-          )}
-        </MotiViewCustom>
+        <MotiViewCustom>{errors.email && <Text style={{ color: 'red' }}>{errors.email.message}</Text>}</MotiViewCustom>
 
         <Controller
           control={control}
           name="password"
           rules={{
-            required: "La contraseña es obligatoria.",
+            required: 'La contraseña es obligatoria.',
             minLength: {
               value: 6,
-              message: "Mínimo 6 caracteres.",
-            },
+              message: 'Mínimo 6 caracteres.'
+            }
           }}
           render={({ field: { onChange, value } }) => (
             <TextInput
@@ -131,10 +125,8 @@ export default function LoginScreen() {
             />
           )}
         />
-        <MotiViewCustom transition={{ type: "timing", duration: 1000 }}>
-          {errors.password && (
-            <Text style={{ color: "red" }}>{errors.password.message}</Text>
-          )}
+        <MotiViewCustom transition={{ type: 'timing', duration: 1000 }}>
+          {errors.password && <Text style={{ color: 'red' }}>{errors.password.message}</Text>}
         </MotiViewCustom>
       </MotiViewCustom>
 

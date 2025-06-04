@@ -72,11 +72,12 @@ export default function CreateTaskModal() {
     navigation.setOptions({
       title: 'Nueva Tarea',
       headerStyle: {
-        backgroundColor: colors.primary
+        // backgroundColor: colors.primary
       },
-      headerTintColor: '#fff',
+      headerTintColor: 'black',
       headerTitleStyle: {
-        fontWeight: '600'
+        fontWeight: '600',
+        color: 'black'
       }
     });
   }, [navigation]);
