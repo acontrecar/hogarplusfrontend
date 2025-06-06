@@ -54,7 +54,7 @@ export default function TabsLayout() {
         }}
       />
       <Tabs.Screen
-        name="tasks"
+        name="debts"
         options={{
           title: 'Deudas',
           tabBarIcon: ({ color, size }) => (

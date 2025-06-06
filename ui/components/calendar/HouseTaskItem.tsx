@@ -3,13 +3,23 @@ import { StyleSheet, View, TouchableOpacity, Text, Alert } from 'react-native';
 import { DeleteTaskDto, HouseTask, Task } from '../../../infraestructure/interfaces/calendar/calendar';
 import { useHousesStore } from '../../../store/useHousesStore';
 import Swipeable from 'react-native-gesture-handler/ReanimatedSwipeable';
-import Animated, { SharedValue, useAnimatedStyle, interpolate, runOnJS, useSharedValue } from 'react-native-reanimated';
+import Animated, {
+  SharedValue,
+  useAnimatedStyle,
+  interpolate,
+  runOnJS,
+  useSharedValue,
+  LinearTransition,
+  FadeIn,
+  FadeOut
+} from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import MaterialCommunityIcons from '@expo/vector-icons/MaterialCommunityIcons';
 import colors from '../../../constants/colors';
 import { useAuthStore } from '../../../store/useAuthStore';
 import { useTaskStore } from '../../../store/useTaskStore';
 import ToastService from '../../../services/ToastService';
+import { default as Reanimated } from 'react-native-reanimated';
 
 const HouseTaskItem = ({ task }: { task: Task }) => {
   const { completeTask } = useHousesStore();
@@ -136,7 +146,10 @@ const HouseTaskItem = ({ task }: { task: Task }) => {
       enableTrackpadTwoFingerGesture
       containerStyle={styles.swipeableContainer}
     >
-      <View
+      <Reanimated.View
+        layout={LinearTransition}
+        entering={FadeIn}
+        exiting={FadeOut}
         style={[
           styles.container,
           { borderLeftColor: getPriorityColor() },
@@ -201,7 +214,7 @@ const HouseTaskItem = ({ task }: { task: Task }) => {
             />
           )}
         </View>
-      </View>
+      </Reanimated.View>
     </Swipeable>
   );
 };
