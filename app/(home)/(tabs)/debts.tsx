@@ -12,6 +12,7 @@ import { CreateTaskDto } from '../../../infraestructure/interfaces/calendar/cale
 import { CreateDebtsDto } from '../../../infraestructure/interfaces/debts/debts.interfaces';
 import { useDebtStore } from '../../../store/useDebtsStore';
 import { FadeIn, FadeOut, LinearTransition, default as Reanimated } from 'react-native-reanimated';
+import { useRouter } from 'expo-router';
 
 interface DebtForm {
   description: string;
@@ -43,6 +44,8 @@ export default function DebtsScreen() {
 
   const { housesAndMembers, getHomesAndMembers } = useHomeStore();
   const { createDebt } = useDebtStore();
+
+  const router = useRouter();
 
   useEffect(() => {
     clearForms();
@@ -139,6 +142,17 @@ export default function DebtsScreen() {
       description: '',
       amount: '',
       members: ''
+    });
+  };
+
+  const handleSeeDebts = () => {
+    if (currentHouse?.id === undefined) {
+      return;
+    }
+
+    router.push({
+      pathname: '/(home)/(modals)/see-debt',
+      params: { homeId: currentHouse?.id?.toString() }
     });
   };
 
@@ -251,12 +265,20 @@ export default function DebtsScreen() {
             <View style={{ alignItems: 'center' }}>
               <AnimatedButtonCustom
                 customStyles={{
-                  backgroundColor: isSubmitting ? colors.primaryLight : colors.primary,
+                  backgroundColor: colors.primaryLight,
                   width: '100%'
                 }}
-                label={isSubmitting ? 'Creando...' : 'Crear Tarea'}
+                label={isSubmitting ? 'Creando...' : 'Crear Deuda'}
                 onPress={handleSubmit}
                 disabled={isSubmitting}
+              />
+              <AnimatedButtonCustom
+                customStyles={{
+                  backgroundColor: colors.infoBlue,
+                  width: '100%'
+                }}
+                label="Ver deudas"
+                onPress={handleSeeDebts}
               />
             </View>
           </Reanimated.View>
@@ -286,7 +308,6 @@ const styles = StyleSheet.create({
     gap: 10,
     borderRadius: 8,
     borderColor: '#30a6a6',
-    backgroundColor: '#f8f8f8',
     borderWidth: 1,
     padding: 10
   },

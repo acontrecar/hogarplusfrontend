@@ -1,3 +1,5 @@
+import { User } from '../../../domain/entities/user';
+
 export interface CreateDebtsDto {
   description: string;
   amount: number;
@@ -5,6 +7,69 @@ export interface CreateDebtsDto {
   homeId: number;
 }
 
-export interface CreateTaskResponse {
+export interface CreateDebtsResponse {
   message: string;
+}
+
+export interface GetDebtsByHome {
+  debts: Debt[];
+}
+
+export interface Debt {
+  id: number;
+  index: number;
+  description: string;
+  homeName: string;
+  amount: string;
+  status: string;
+  createdAt: Date;
+  creditor: Creditor;
+  affectedMembers: AffectedMember[];
+}
+
+export interface AffectedMember {
+  id: number;
+  name: string;
+  debtMemberId: string;
+  avatar: string | undefined;
+  amount: string;
+  isPaid: boolean;
+}
+
+export interface Creditor {
+  id: number;
+  name: string;
+  avatar: string | undefined;
+}
+
+export interface PaidDebtMember {
+  debtMember: DebtMember;
+}
+
+export interface DebtMember {
+  id: number;
+  debt: DebtPaid;
+  debtor: Tor;
+  amount: string;
+  isPaid: boolean;
+}
+
+export interface DebtPaid {
+  id: number;
+  amount: string;
+  description: string;
+  status: string;
+  creditor: Tor;
+  createdAt: Date;
+}
+
+export interface Tor {
+  id: number;
+  role: string;
+  createdAt: Date;
+  user?: User;
+}
+
+export interface DeleteDebtResponse {
+  debtIdDelete: number;
 }
