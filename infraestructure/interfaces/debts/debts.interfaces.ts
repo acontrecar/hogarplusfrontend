@@ -21,7 +21,7 @@ export interface Debt {
   description: string;
   homeName: string;
   amount: string;
-  status: string;
+  status: DebtStatus;
   createdAt: Date;
   creditor: Creditor;
   affectedMembers: AffectedMember[];
@@ -58,7 +58,7 @@ export interface DebtPaid {
   id: number;
   amount: string;
   description: string;
-  status: string;
+  status: DebtStatus;
   creditor: Tor;
   createdAt: Date;
 }
@@ -72,4 +72,9 @@ export interface Tor {
 
 export interface DeleteDebtResponse {
   debtIdDelete: number;
+}
+
+export enum DebtStatus {
+  PENDING = 'pending',
+  COMPLETED = 'completed'
 }

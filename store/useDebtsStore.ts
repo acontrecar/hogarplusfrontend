@@ -86,7 +86,7 @@ export const useDebtStore = create<DebtsState>(set => ({
           ? {
               ...debt,
               affectedMembers: debt.affectedMembers.map(member =>
-                member.id === debtMember.debtor.id ? { ...member, isPaid: debtMember.isPaid } : member
+                member.id === debtMember.debtor.user.id ? { ...member, isPaid: debtMember.isPaid } : member
               )
             }
           : debt

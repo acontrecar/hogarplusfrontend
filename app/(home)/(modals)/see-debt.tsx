@@ -1,4 +1,4 @@
-import { useLocalSearchParams } from 'expo-router';
+import { useLocalSearchParams, useNavigation } from 'expo-router';
 import React, { useEffect, useRef, useState } from 'react';
 import { FlatList, Image, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { LinearTransition, default as Reanimated, FadeIn, FadeOut } from 'react-native-reanimated';
@@ -10,12 +10,16 @@ import colors from '../../../constants/colors';
 import ToastService from '../../../services/ToastService';
 import Loader from '../../loader';
 import { sleep } from '../../../hooks/useSleep';
+import { useHomeStore } from '../../../store/useHomeStore';
+import { DebtStatus } from '../../../infraestructure/interfaces/debts/debts.interfaces';
 
 export default function CreateDebtModal() {
   const params = useLocalSearchParams<{ homeId?: string }>();
+  const navigation = useNavigation();
 
   const { debtsByHome, isLoading, getDebtsByHome, paisDebtMember, deleteDebt } = useDebtStore();
   const { user } = useAuthStore();
+  const { currentHome } = useHomeStore();
 
   const [homeId, setHomeId] = useState(params.homeId);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -27,6 +31,12 @@ export default function CreateDebtModal() {
   const fetchDebts = async () => {
     await getDebtsByHome(homeId!);
   };
+
+  useEffect(() => {
+    navigation.setOptions({
+      title: currentHome?.name
+    });
+  }, [currentHome]);
 
   useEffect(() => {
     if (homeId) {
@@ -115,7 +125,21 @@ export default function CreateDebtModal() {
 
           <View style={styles.content}>
             <View style={styles.header}>
-              <Text style={styles.title}>{currentDebt.description}</Text>
+              <Text
+                style={styles.title}
+                numberOfLines={3}
+                ellipsizeMode={'tail'}
+              >
+                {currentDebt.description}
+              </Text>
+              <Text
+                style={[
+                  styles.title,
+                  { color: currentDebt.status === DebtStatus.COMPLETED ? 'green' : colors.accentRed }
+                ]}
+              >
+                {currentDebt.status === DebtStatus.COMPLETED ? 'Completada' : 'Pendiente'}
+              </Text>
               <Text style={styles.subTitle}>
                 {' '}
                 {new Date(currentDebt.createdAt || Date.now()).toLocaleDateString('es-ES', {
@@ -190,7 +214,9 @@ export default function CreateDebtModal() {
                       </View>
 
                       <View>
-                        <Text style={styles.cardText}>{item.amount}€</Text>
+                        <Text style={[styles.cardText, { color: item.isPaid ? 'green' : colors.accentRed }]}>
+                          {item.amount}€
+                        </Text>
                       </View>
                     </View>
                   )}
