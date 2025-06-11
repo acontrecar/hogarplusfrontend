@@ -10,6 +10,7 @@ import {
   SlideInLeft,
   SlideInRight
 } from 'react-native-reanimated';
+import Loader from '../../app/loader';
 
 interface TaskDashboardProps {
   houseId: string;
@@ -70,12 +71,7 @@ export const TaskSummary = ({ houseId }: TaskDashboardProps) => {
   };
 
   const renderTaskItem = ({ item }: { item: any }) => (
-    <Reanimated.View
-      entering={SlideInRight}
-      exiting={SlideInLeft}
-      layout={LinearTransition}
-      style={styles.taskItem}
-    >
+    <View style={styles.taskItem}>
       <View style={styles.taskContent}>
         <View style={styles.taskHeader}>
           <Text
@@ -114,15 +110,11 @@ export const TaskSummary = ({ houseId }: TaskDashboardProps) => {
           {item.duration && <Text style={styles.taskDuration}>{item.duration}</Text>}
         </View>
       </View>
-    </Reanimated.View>
+    </View>
   );
 
   if (isLoading) {
-    return (
-      <View style={styles.loadingContainer}>
-        <Text>Cargando tareas...</Text>
-      </View>
-    );
+    return <Loader />;
   }
 
   return (

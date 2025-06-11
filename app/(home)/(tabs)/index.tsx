@@ -4,6 +4,7 @@ import { FadeIn, FadeOut, default as Reanimated } from 'react-native-reanimated'
 import { HomesDropDown } from '../../../ui/components/HomesDropDown';
 import { useHomeStore } from '../../../store/useHomeStore';
 import { TaskSummary } from '../../../ui/components/TaskSummary';
+import { DebtSummary } from '../../../ui/components/DebtSummary';
 
 export default function HomeScreen() {
   const { housesAndMembers, getHomesAndMembers } = useHomeStore();
@@ -29,7 +30,14 @@ export default function HomeScreen() {
       </View>
 
       {currentHouse?.id ? (
-        <TaskSummary houseId={currentHouse.id.toString()} />
+        <ScrollView
+          contentContainerStyle={styles.scrollContent}
+          style={styles.scrollView}
+          showsVerticalScrollIndicator={false}
+        >
+          <TaskSummary houseId={currentHouse.id.toString()} />
+          <DebtSummary houseId={currentHouse.id.toString()} />
+        </ScrollView>
       ) : (
         <View style={{ alignItems: 'center', marginTop: 20 }}>
           <Text>Seleccione un hogar</Text>
@@ -51,5 +59,7 @@ const styles = StyleSheet.create({
   scrollView: {
     flex: 1
   },
-  scrollContent: {}
+  scrollContent: {
+    paddingBottom: 50
+  }
 });

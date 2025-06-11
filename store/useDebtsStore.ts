@@ -1,30 +1,35 @@
 import { create } from 'zustand';
-import { HouseTask } from '../infraestructure/interfaces/calendar/calendar';
-import { mockHouseTasks } from '../mocks/houseTasks';
-import { HomeAndMembers } from '../infraestructure/interfaces/home/home.interfaces';
-import { CreateDebtsDto, Debt } from '../infraestructure/interfaces/debts/debts.interfaces';
+import { CreateDebtsDto, Debt, SummaryDebtResponse } from '../infraestructure/interfaces/debts/debts.interfaces';
 import {
   createDebtAction,
   deleteDebtAction,
   getDebtsByHomeAction,
-  payDebtMemberAction
+  payDebtMemberAction,
+  summaryDebtAction
 } from '../action/debts/debts.action';
-import { get } from 'lodash';
 
 interface DebtsState {
   isLoading: boolean;
   errorMessage?: string;
   debtsByHome: Debt[];
+  summary: SummaryDebtResponse;
   createDebt: (debt: CreateDebtsDto) => Promise<boolean>;
   getDebtsByHome: (homeId: string) => Promise<boolean>;
   paisDebtMember: (debtMemberId: string) => Promise<boolean>;
   deleteDebt: (debtId: string) => Promise<boolean>;
+  summaryDebt: (homeId: string) => Promise<boolean>;
 }
 
 export const useDebtStore = create<DebtsState>(set => ({
   isLoading: false,
   errorMessage: undefined,
   debtsByHome: [],
+  summary: {
+    totalOwedToMe: 0,
+    totalIOwe: 0,
+    balance: 0,
+    lastDebtIAffect: []
+  },
   createDebt: async debt => {
     set({ isLoading: true });
     const resp = await createDebtAction(debt);
@@ -113,6 +118,23 @@ export const useDebtStore = create<DebtsState>(set => ({
       errorMessage: undefined,
       debtsByHome: state.debtsByHome.filter(debt => debt.id.toString() !== debtId)
     }));
+    return true;
+  },
+  summaryDebt: async homeId => {
+    set({ isLoading: true });
+    const resp = await summaryDebtAction(homeId);
+
+    if (!resp) {
+      set({ errorMessage: 'Error inesperado', isLoading: false });
+      return false;
+    }
+
+    if (!resp.ok) {
+      set({ errorMessage: resp.message, isLoading: false });
+      return false;
+    }
+
+    set({ isLoading: false, errorMessage: undefined, summary: resp.data });
     return true;
   }
 }));

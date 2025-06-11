@@ -78,3 +78,22 @@ export enum DebtStatus {
   PENDING = 'pending',
   COMPLETED = 'completed'
 }
+
+export interface SummaryDebtResponse {
+  totalOwedToMe: number;
+  totalIOwe: number;
+  balance: number;
+  lastDebtIAffect: LastDebtIAffect[];
+}
+
+export interface LastDebtIAffect {
+  id: number;
+  description: string;
+  amount: number;
+  creditor: Creditor;
+}
+
+export interface Creditor {
+  id: number;
+  name: string;
+}

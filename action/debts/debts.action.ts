@@ -5,7 +5,8 @@ import {
   CreateDebtsResponse,
   DeleteDebtResponse,
   GetDebtsByHome,
-  PaidDebtMember
+  PaidDebtMember,
+  SummaryDebtResponse
 } from '../../infraestructure/interfaces/debts/debts.interfaces';
 import { GlobalApiResponse } from '../../infraestructure/interfaces/global/global-api-response';
 import { handleApiCall } from '../handleApiCall';
@@ -26,4 +27,8 @@ export const payDebtMemberAction = async (debtMemberId: string): Promise<GlobalA
 
 export const deleteDebtAction = async (debtId: string): Promise<GlobalApiResponse<DeleteDebtResponse> | null> => {
   return handleApiCall(() => hogarPlusApi.delete<GlobalApiResponse<DeleteDebtResponse>>('/debts/' + debtId));
+};
+
+export const summaryDebtAction = async (homeId: string): Promise<GlobalApiResponse<SummaryDebtResponse> | null> => {
+  return handleApiCall(() => hogarPlusApi.get<GlobalApiResponse<SummaryDebtResponse>>(`/debts/${homeId}/summary`));
 };
