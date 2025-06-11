@@ -1,20 +1,34 @@
 import { create } from 'zustand';
-import { CreateTaskDto, DeleteTaskDto, Task } from '../infraestructure/interfaces/calendar/calendar';
-import { getTasksByHouse, createTaskAction, deleteTaskAction, completeTaskAction } from '../action/taks/task.action';
+import { CreateTaskDto, DeleteTaskDto, SummaryDto, Task } from '../infraestructure/interfaces/calendar/calendar';
+import {
+  getTasksByHouse,
+  createTaskAction,
+  deleteTaskAction,
+  completeTaskAction,
+  summaryTaskAction
+} from '../action/taks/task.action';
 
 interface TaskState {
   tasks: Task[];
   isLoading: boolean;
   errorMessage?: string;
+  summary: SummaryDto;
   getTasksByHouse: (houseId: string) => Promise<boolean>;
   createTask: (createTask: CreateTaskDto) => Promise<boolean>;
   deleteTask: (deleteTaskDto: DeleteTaskDto) => Promise<boolean>;
   compleTask: (taskId: string) => Promise<boolean>;
+  summaryTask: (homeId: string) => Promise<boolean>;
 }
 
 export const useTaskStore = create<TaskState>(set => ({
   tasks: [],
   isLoading: false,
+  summary: {
+    tasksPending: 0,
+    tasksUrgy: 0,
+    tasksCompleted: 0,
+    upcomingTasks: []
+  },
   errorMessage: undefined,
   getTasksByHouse: async (houseId: string) => {
     set({ isLoading: true });
@@ -111,6 +125,23 @@ export const useTaskStore = create<TaskState>(set => ({
       tasks: state.tasks.map(task => (task.id === Number(taskId) ? resp.data.task : task))
     }));
 
+    return true;
+  },
+  summaryTask: async (homeId: string) => {
+    set({ isLoading: true });
+    const resp = await summaryTaskAction(homeId);
+
+    if (!resp) {
+      set({ errorMessage: 'Error inesperado', isLoading: false });
+      return false;
+    }
+
+    if (!resp.ok) {
+      set({ errorMessage: resp.message, isLoading: false });
+      return false;
+    }
+
+    set({ isLoading: false, errorMessage: undefined, summary: resp.data });
     return true;
   }
 }));

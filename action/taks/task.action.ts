@@ -5,6 +5,7 @@ import {
   CreateTaskResponse,
   DeleteTaskDto,
   GetTasksResponse,
+  SummaryDto,
   Task
 } from '../../infraestructure/interfaces/calendar/calendar';
 import { GlobalApiResponse } from '../../infraestructure/interfaces/global/global-api-response';
@@ -26,6 +27,9 @@ export const completeTaskAction = async (taskId: string): Promise<GlobalApiRespo
 };
 
 export const deleteTaskAction = async (deleteTaskDto: DeleteTaskDto): Promise<GlobalApiResponse<Task> | null> => {
-  console.log({ deleteTaskDto });
   return handleApiCall(() => hogarPlusApi.post<GlobalApiResponse<Task>>(`/task/house`, deleteTaskDto));
+};
+
+export const summaryTaskAction = async (homeId: string): Promise<GlobalApiResponse<SummaryDto> | null> => {
+  return handleApiCall(() => hogarPlusApi.get<GlobalApiResponse<SummaryDto>>(`/task/${homeId}/summary`));
 };

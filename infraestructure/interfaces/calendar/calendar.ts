@@ -51,6 +51,7 @@ export interface Task {
   createdBy: CreatedBy;
   completedBy: CreatedBy[];
   createdAt: Date;
+  updatedAt?: Date;
 }
 
 export interface GetTasksResponse {
@@ -88,3 +89,10 @@ export type AgendaSection = {
   title: string;
   data: Task[];
 };
+
+export interface SummaryDto {
+  tasksPending: number;
+  tasksUrgy: number;
+  tasksCompleted: number;
+  upcomingTasks: Omit<Task, 'house' | 'assignedTo' | 'createdBy' | 'completedBy'>[];
+}
