@@ -132,13 +132,43 @@ export const DebtSummary = ({ houseId }: DebtSummaryProps) => {
         <Text style={styles.sectionTitle}>Deudas Recientes</Text>
 
         {summary.lastDebtIAffect?.length > 0 ? (
-          <FlatList
-            data={summary.lastDebtIAffect}
-            renderItem={renderDebtItem}
-            keyExtractor={item => item.id.toString()}
-            showsVerticalScrollIndicator={false}
-            style={styles.debtList}
-          />
+          //   <FlatList
+          //     data={summary.lastDebtIAffect}
+          //     renderItem={renderDebtItem}
+          //     keyExtractor={item => item.id.toString()}
+          //     showsVerticalScrollIndicator={false}
+          //     style={styles.debtList}
+          //   />
+          <View style={styles.debtList}>
+            {summary.lastDebtIAffect.map(debt => (
+              <View
+                key={debt.id}
+                style={styles.debtItem}
+              >
+                <View style={styles.debtContent}>
+                  <View style={styles.debtHeader}>
+                    <View style={styles.debtInfo}>
+                      <Text
+                        style={styles.debtCreditor}
+                        numberOfLines={1}
+                      >
+                        {debt.creditor.name}
+                      </Text>
+                      <Text
+                        style={styles.debtDescription}
+                        numberOfLines={2}
+                      >
+                        {debt.description}
+                      </Text>
+                    </View>
+                    <View style={styles.amountContainer}>
+                      <Text style={styles.debtAmount}>{formatCurrency(debt.amount)}</Text>
+                    </View>
+                  </View>
+                </View>
+              </View>
+            ))}
+          </View>
         ) : (
           <View style={styles.emptyState}>
             <MaterialIcons

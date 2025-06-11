@@ -70,49 +70,6 @@ export const TaskSummary = ({ houseId }: TaskDashboardProps) => {
     }
   };
 
-  const renderTaskItem = ({ item }: { item: any }) => (
-    <View style={styles.taskItem}>
-      <View style={styles.taskContent}>
-        <View style={styles.taskHeader}>
-          <Text
-            style={styles.taskTitle}
-            numberOfLines={1}
-          >
-            {item.title}
-          </Text>
-          <View style={[styles.priorityBadge, { backgroundColor: getPriorityColor(item.priority) }]}>
-            <MaterialIcons
-              name={getPriorityIcon(item.priority)}
-              size={12}
-              color="white"
-            />
-          </View>
-        </View>
-
-        <Text
-          style={styles.taskDescription}
-          numberOfLines={2}
-        >
-          {item.description}
-        </Text>
-
-        <View style={styles.taskFooter}>
-          <View style={styles.taskDate}>
-            <MaterialIcons
-              name="schedule"
-              size={14}
-              color="#6B7280"
-            />
-            <Text style={styles.taskDateText}>
-              {formatDate(item.date)} - {item.time}
-            </Text>
-          </View>
-          {item.duration && <Text style={styles.taskDuration}>{item.duration}</Text>}
-        </View>
-      </View>
-    </View>
-  );
-
   if (isLoading) {
     return <Loader />;
   }
@@ -163,14 +120,34 @@ export const TaskSummary = ({ houseId }: TaskDashboardProps) => {
         <Text style={styles.sectionTitle}>Próximas Tareas</Text>
 
         {summary.upcomingTasks.length > 0 ? (
-          <FlatList
-            data={summary.upcomingTasks}
-            renderItem={renderTaskItem}
-            // horizontal
-            keyExtractor={item => item.id.toString()}
-            showsVerticalScrollIndicator={false}
-            style={styles.taskList}
-          />
+          <View style={styles.taskList}>
+            {summary.upcomingTasks.map(task => (
+              <View
+                key={task.id}
+                style={styles.taskItem}
+              >
+                <View style={styles.taskHeader}>
+                  <Text
+                    numberOfLines={1}
+                    style={styles.taskTitle}
+                  >
+                    {task.title}
+                  </Text>
+                  <MaterialIcons
+                    name={getPriorityIcon(task.priority)}
+                    size={16}
+                    color={getPriorityColor(task.priority)}
+                  />
+                </View>
+                <View style={styles.taskFooter}>
+                  <Text style={styles.taskDateText}>
+                    {formatDate(task.date)} - {task.time}
+                  </Text>
+                  {task.duration && <Text style={styles.taskDuration}>{task.duration}</Text>}
+                </View>
+              </View>
+            ))}
+          </View>
         ) : (
           <View style={styles.emptyState}>
             <MaterialIcons
@@ -248,65 +225,57 @@ const styles = StyleSheet.create({
   },
   taskItem: {
     backgroundColor: 'white',
-    borderRadius: 12,
-    marginBottom: 12,
-    elevation: 2,
+    borderRadius: 10,
+    marginBottom: 10,
+    paddingVertical: 12,
+    paddingHorizontal: 14,
+    elevation: 1,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4
-  },
-  taskContent: {
-    padding: 16
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.05,
+    shadowRadius: 2
   },
   taskHeader: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8
+    justifyContent: 'space-between',
+    marginBottom: 4
   },
   taskTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#1F2937',
+    fontSize: 15,
+    fontWeight: '500',
+    color: '#111827',
     flex: 1,
     marginRight: 8
   },
-  priorityBadge: {
-    borderRadius: 12,
-    padding: 4,
-    minWidth: 24,
-    height: 24,
-    justifyContent: 'center',
-    alignItems: 'center'
-  },
   taskDescription: {
-    fontSize: 14,
-    color: '#6B7280',
-    marginBottom: 12,
-    lineHeight: 20
+    display: 'none'
   },
   taskFooter: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    alignItems: 'center'
-  },
-  taskDate: {
-    flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+    marginTop: 4
   },
   taskDateText: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#6B7280',
     marginLeft: 4
   },
   taskDuration: {
-    fontSize: 12,
+    fontSize: 11,
     color: '#6B7280',
     backgroundColor: '#F3F4F6',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 8
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 6
+  },
+  priorityBadge: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   emptyState: {
     flex: 1,
