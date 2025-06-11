@@ -5,24 +5,28 @@ import {
   createTaskAction,
   deleteTaskAction,
   completeTaskAction,
-  summaryTaskAction
+  summaryTaskAction,
+  urgyTaskAction
 } from '../action/taks/task.action';
 
 interface TaskState {
   tasks: Task[];
   isLoading: boolean;
   errorMessage?: string;
+  tasksUrgy: Task[];
   summary: SummaryDto;
   getTasksByHouse: (houseId: string) => Promise<boolean>;
   createTask: (createTask: CreateTaskDto) => Promise<boolean>;
   deleteTask: (deleteTaskDto: DeleteTaskDto) => Promise<boolean>;
   compleTask: (taskId: string) => Promise<boolean>;
   summaryTask: (homeId: string) => Promise<boolean>;
+  urgyTask: (homeId: string) => Promise<boolean>;
 }
 
 export const useTaskStore = create<TaskState>(set => ({
   tasks: [],
   isLoading: false,
+  tasksUrgy: [],
   summary: {
     tasksPending: 0,
     tasksUrgy: 0,
@@ -142,6 +146,23 @@ export const useTaskStore = create<TaskState>(set => ({
     }
 
     set({ isLoading: false, errorMessage: undefined, summary: resp.data });
+    return true;
+  },
+  urgyTask: async (homeId: string) => {
+    set({ isLoading: true });
+    const resp = await urgyTaskAction(homeId);
+
+    if (!resp) {
+      set({ errorMessage: 'Error inesperado', isLoading: false });
+      return false;
+    }
+
+    if (!resp.ok) {
+      set({ errorMessage: resp.message, isLoading: false });
+      return false;
+    }
+
+    set({ isLoading: false, errorMessage: undefined, tasksUrgy: resp.data.urgyTasks });
     return true;
   }
 }));

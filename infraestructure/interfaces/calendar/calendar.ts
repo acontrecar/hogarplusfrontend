@@ -96,3 +96,7 @@ export interface SummaryDto {
   tasksCompleted: number;
   upcomingTasks: Omit<Task, 'house' | 'assignedTo' | 'createdBy' | 'completedBy'>[];
 }
+
+export interface UrgencyTask {
+  urgyTasks: Task[];
+}

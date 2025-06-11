@@ -71,6 +71,16 @@ export default function HomeLayout() {
           }}
         />
         <Stack.Screen
+          name="(modals)/urgency-task"
+          options={{
+            presentation: 'containedModal',
+            animation: 'fade',
+            headerShown: true,
+            gestureEnabled: true,
+            title: 'Tareas Urgentes'
+          }}
+        />
+        <Stack.Screen
           name="manage-homes"
           options={{
             title: 'Gestionar Viviendas',

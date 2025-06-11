@@ -11,6 +11,7 @@ import {
   SlideInRight
 } from 'react-native-reanimated';
 import Loader from '../../app/loader';
+import { useRouter } from 'expo-router';
 
 interface TaskDashboardProps {
   houseId: string;
@@ -18,12 +19,22 @@ interface TaskDashboardProps {
 
 export const TaskSummary = ({ houseId }: TaskDashboardProps) => {
   const { summary, summaryTask, isLoading } = useTaskStore();
+  const router = useRouter();
 
   useEffect(() => {
     if (houseId) {
       summaryTask(houseId);
     }
   }, [houseId]);
+
+  const handleUrgencyTask = () => {
+    if (summary.tasksUrgy > 0) {
+      router.push({
+        pathname: '/(home)/(modals)/urgency-task',
+        params: { homeId: houseId?.toString() }
+      });
+    }
+  };
 
   const getPriorityColor = (priority: string) => {
     switch (priority) {
@@ -95,7 +106,10 @@ export const TaskSummary = ({ houseId }: TaskDashboardProps) => {
           <Text style={styles.summaryLabel}>Pendientes</Text>
         </View>
 
-        <View style={[styles.summaryCard, styles.urgentCard]}>
+        <TouchableOpacity
+          onPress={handleUrgencyTask}
+          style={[styles.summaryCard, styles.urgentCard]}
+        >
           <MaterialIcons
             name="warning"
             size={24}
@@ -103,7 +117,7 @@ export const TaskSummary = ({ houseId }: TaskDashboardProps) => {
           />
           <Text style={styles.summaryNumber}>{summary.tasksUrgy}</Text>
           <Text style={styles.summaryLabel}>Urgentes</Text>
-        </View>
+        </TouchableOpacity>
 
         <View style={[styles.summaryCard, styles.completedCard]}>
           <MaterialIcons
