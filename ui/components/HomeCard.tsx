@@ -1,19 +1,16 @@
-import React, { useEffect, useState } from "react";
-import { Alert, Image, Pressable, StyleSheet, Text, View } from "react-native";
-import colors from "../../constants/colors";
-import {
-  Home,
-  RolHome,
-} from "../../infraestructure/interfaces/home/home.interfaces";
-import Animated, { FadeIn } from "react-native-reanimated";
-import { AnimatedButtonCustom } from "./AnimatedButtonCustom";
-import { useHomeStore } from "../../store/useHomeStore";
-import { FontAwesome } from "@expo/vector-icons";
-import Feather from "@expo/vector-icons/Feather";
-import { useAuthStore } from "../../store/useAuthStore";
-import * as Clipboard from "expo-clipboard";
-import ToastService from "../../services/ToastService";
-import { Link, useRouter } from "expo-router";
+import React, { useEffect, useState } from 'react';
+import { Alert, Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import colors from '../../constants/colors';
+import { Home, RolHome } from '../../infraestructure/interfaces/home/home.interfaces';
+import Animated, { FadeIn } from 'react-native-reanimated';
+import { AnimatedButtonCustom } from './AnimatedButtonCustom';
+import { useHomeStore } from '../../store/useHomeStore';
+import { FontAwesome } from '@expo/vector-icons';
+import Feather from '@expo/vector-icons/Feather';
+import { useAuthStore } from '../../store/useAuthStore';
+import * as Clipboard from 'expo-clipboard';
+import ToastService from '../../services/ToastService';
+import { Link, useRouter } from 'expo-router';
 
 interface HomeCardProps {
   home: Home;
@@ -23,73 +20,56 @@ interface HomeCardProps {
 export const HomeCard = ({ home, roll }: HomeCardProps) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const router = useRouter();
-  const {
-    homeDetails,
-    isLoading,
-    getHomeDetails,
-    deleteHome,
-    exitFromHome,
-    deletePersonFromHome,
-  } = useHomeStore();
+  const { homeDetails, isLoading, getHomeDetails, deleteHome, exitFromHome, deletePersonFromHome } = useHomeStore();
   const { user } = useAuthStore();
   const details = homeDetails[home.id];
 
   const copyInvitationCode = () => {
     if (home.invitationCode) {
       Clipboard.setStringAsync(home.invitationCode);
-      ToastService.success(
-        "Código copiado",
-        "El código de invitación copiado."
-      );
+      ToastService.success('Código copiado', 'El código de invitación copiado.');
     }
   };
 
   const onExitHome = () => {
-    Alert.alert("¿Salir del hogar?", "¿Estás seguro de que quieres salir?", [
+    Alert.alert('¿Salir del hogar?', '¿Estás seguro de que quieres salir?', [
       {
-        text: "Cancelar",
-        style: "cancel",
+        text: 'Cancelar',
+        style: 'cancel'
       },
       {
-        text: "Aceptar",
-        style: "destructive",
+        text: 'Aceptar',
+        style: 'destructive',
         onPress: async () => {
           await exitHome(details.id);
-        },
-      },
+        }
+      }
     ]);
   };
 
   const onDeletePerson = (memberId: number) => {
-    Alert.alert(
-      "¿Eliminar al usuario?",
-      "¿Estás seguro de que quieres eliminar?",
-      [
-        {
-          text: "Cancelar",
-          style: "cancel",
-        },
-        {
-          text: "Aceptar",
-          style: "destructive",
-          onPress: async () => {
-            await deletePerson(details.id, memberId);
-          },
-        },
-      ]
-    );
+    Alert.alert('¿Eliminar al usuario?', '¿Estás seguro de que quieres eliminar?', [
+      {
+        text: 'Cancelar',
+        style: 'cancel'
+      },
+      {
+        text: 'Aceptar',
+        style: 'destructive',
+        onPress: async () => {
+          await deletePerson(details.id, memberId);
+        }
+      }
+    ]);
   };
 
   const exitHome = async (homeId: number) => {
     const success = await exitFromHome(homeId);
 
     if (success) {
-      ToastService.success(
-        "Salida realizada",
-        "Has salido del hogar correctamente"
-      );
+      ToastService.success('Salida realizada', 'Has salido del hogar correctamente');
     } else {
-      ToastService.error("Error al salir", "No se ha podido salir del hogar");
+      ToastService.error('Error al salir', 'No se ha podido salir del hogar');
     }
   };
 
@@ -98,30 +78,24 @@ export const HomeCard = ({ home, roll }: HomeCardProps) => {
     const success = await deletePersonFromHome(homeId, memberId);
 
     if (success) {
-      ToastService.success(
-        "Usuario eliminado",
-        "Has eliminado al usuario correctamente"
-      );
+      ToastService.success('Usuario eliminado', 'Has eliminado al usuario correctamente');
     } else {
-      ToastService.error(
-        "Error al eliminar",
-        "No se ha podido eliminar al usuario"
-      );
+      ToastService.error('Error al eliminar', 'No se ha podido eliminar al usuario');
     }
   };
 
-  useEffect(() => {
-    return () => {
-      useHomeStore.setState({ homeDetails: {}, homesByUser: [] });
-    };
-  }, []);
+  // useEffect(() => {
+  //   return () => {
+  //     useHomeStore.setState({ homeDetails: {}, homesByUser: [] });
+  //   };
+  // }, []);
 
   const toggleExpanded = async () => {
     if (!isExpanded && !details) {
       await getHomeDetails(home.id);
     }
 
-    setIsExpanded((prev) => !prev);
+    setIsExpanded(prev => !prev);
   };
 
   const deleteButton = async () => {
@@ -132,25 +106,25 @@ export const HomeCard = ({ home, roll }: HomeCardProps) => {
 
   const handleDelete = () => {
     router.push({
-      pathname: "/(home)/(modals)/confirm",
+      pathname: '/(home)/(modals)/confirm',
       params: {
         title: home.name,
-        homeId: home.id.toString(),
-      },
+        homeId: home.id.toString()
+      }
     });
   };
 
   return (
     <AnimatedButtonCustom
       customStyles={{
-        width: "100%",
-        alignItems: "center",
+        width: '100%',
+        alignItems: 'center',
         padding: 10,
         marginBottom: 10,
         borderWidth: 3,
         borderRadius: 29,
         borderColor: colors.background,
-        backgroundColor: colors.light,
+        backgroundColor: colors.light
       }}
       onPress={toggleExpanded}
     >
@@ -162,8 +136,11 @@ export const HomeCard = ({ home, roll }: HomeCardProps) => {
         <Animated.View entering={FadeIn}>
           {details.members.length > 0 && (
             <View style={styles.expandContainer}>
-              {details.members.map((member) => (
-                <View key={member.userId} style={styles.memberItem}>
+              {details.members.map(member => (
+                <View
+                  key={member.userId}
+                  style={styles.memberItem}
+                >
                   <View>
                     {member.avatar ? (
                       <Image
@@ -172,19 +149,30 @@ export const HomeCard = ({ home, roll }: HomeCardProps) => {
                       />
                     ) : (
                       <View style={styles.avatarPlaceholder}>
-                        <FontAwesome name="user" size={20} color="#9CA3AF" />
+                        <FontAwesome
+                          name="user"
+                          size={20}
+                          color="#9CA3AF"
+                        />
                       </View>
                     )}
                   </View>
 
-                  <Text numberOfLines={1} style={styles.memberText}>
+                  <Text
+                    numberOfLines={1}
+                    style={styles.memberText}
+                  >
                     {member.name}
-                    {member.email === user?.email && " (Tú) "}
+                    {member.email === user?.email && ' (Tú) '}
                   </Text>
 
-                  {roll === "admin" && member.email !== user?.email ? (
+                  {roll === 'admin' && member.email !== user?.email ? (
                     <Pressable onPress={() => onDeletePerson(member.memberId)}>
-                      <Feather name="trash-2" size={20} color="black" />
+                      <Feather
+                        name="trash-2"
+                        size={20}
+                        color="black"
+                      />
                     </Pressable>
                   ) : (
                     <View></View>
@@ -198,7 +186,7 @@ export const HomeCard = ({ home, roll }: HomeCardProps) => {
                   label="Copiar enlace"
                   disabled={isLoading}
                 />
-                {roll === "admin" && (
+                {roll === 'admin' && (
                   // <Link href="/(home)/(modals)/confirm" asChild>
                   <AnimatedButtonCustom
                     customStyles={styles.closeButton}
@@ -209,7 +197,7 @@ export const HomeCard = ({ home, roll }: HomeCardProps) => {
                   />
                   // </Link>
                 )}
-                {roll === "member" && (
+                {roll === 'member' && (
                   <AnimatedButtonCustom
                     customStyles={styles.closeButton}
                     // onPress={deleteButton}
@@ -221,9 +209,7 @@ export const HomeCard = ({ home, roll }: HomeCardProps) => {
               </View>
             </View>
           )}
-          {details.members.length === 0 && (
-            <Text style={styles.noMembers}>No hay miembros en este hogar</Text>
-          )}
+          {details.members.length === 0 && <Text style={styles.noMembers}>No hay miembros en este hogar</Text>}
         </Animated.View>
       )}
     </AnimatedButtonCustom>
@@ -236,48 +222,48 @@ const styles = StyleSheet.create({
     height: 40,
     borderRadius: 60,
     borderWidth: 2,
-    borderColor: "#ccc",
+    borderColor: '#ccc'
   },
   closeButton: {
-    width: "50%",
+    width: '50%',
     backgroundColor: colors.accentRed,
     borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: 20
   },
   closeText: {
-    fontWeight: "bold",
+    fontWeight: 'bold'
   },
   acceptButton: {
-    width: "50%",
+    width: '50%',
     backgroundColor: colors.primaryLight,
     borderRadius: 20,
-    justifyContent: "center",
-    alignItems: "center",
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingVertical: 10,
-    paddingHorizontal: 20,
+    paddingHorizontal: 20
   },
   buttonRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    width: "100%",
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%'
   },
   avatarPlaceholder: {
     width: 40,
     height: 40,
     borderRadius: 60,
-    backgroundColor: "#E5E7EB",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#E5E7EB',
+    justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 2,
-    borderColor: "#ccc",
+    borderColor: '#ccc'
   },
   container: {
-    width: "100%",
-    alignItems: "center",
-    marginBottom: 10,
+    width: '100%',
+    alignItems: 'center',
+    marginBottom: 10
   },
   header: {
     padding: 15,
@@ -285,35 +271,35 @@ const styles = StyleSheet.create({
     borderColor: colors.background,
     borderRadius: 100,
     backgroundColor: colors.light,
-    width: "100%",
-    alignItems: "center",
+    width: '100%',
+    alignItems: 'center'
   },
   title: {
     fontSize: 18,
-    fontWeight: "bold",
+    fontWeight: 'bold'
   },
   expandContainer: {
-    overflow: "hidden",
+    overflow: 'hidden',
     marginTop: 5,
     padding: 10,
-    width: "100%",
+    width: '100%'
   },
   memberItem: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    width: "100%",
-    marginBottom: 10,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: 10
   },
   memberText: {
-    fontSize: 16,
+    fontSize: 16
   },
   memberSubtext: {
     fontSize: 14,
-    color: "gray",
+    color: 'gray'
   },
   noMembers: {
-    fontStyle: "italic",
-    color: "gray",
-  },
+    fontStyle: 'italic',
+    color: 'gray'
+  }
 });

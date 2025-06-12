@@ -1,28 +1,19 @@
-import {
-  Alert,
-  Image,
-  Pressable,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  View,
-} from "react-native";
-import { MotiViewCustom } from "../../../ui/components/MotiViewCustom";
-import { useAuthStore } from "../../../store/useAuthStore";
-import { globalStyles } from "../../../constants/styles";
-import colors from "../../../constants/colors";
-import { useScreenDimensions } from "../../../hooks/useScreenDimensions";
-import { useState } from "react";
-import { CameraAdapter } from "../../../config/adapters/camera-adapter";
-import { FontAwesome } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
-import { AnimatedButtonCustom } from "../../../ui/components/AnimatedButtonCustom";
-import { Controller, useForm } from "react-hook-form";
-import ToastService from "../../../services/ToastService";
-import { HomesDropDown } from "../../../ui/components/HomesDropDown";
-import { useHomeStore } from "../../../store/useHomeStore";
-import { HomeAndMembers } from "../../../infraestructure/interfaces/home/home.interfaces";
+import { Alert, Image, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { MotiViewCustom } from '../../../ui/components/MotiViewCustom';
+import { useAuthStore } from '../../../store/useAuthStore';
+import { globalStyles } from '../../../constants/styles';
+import colors from '../../../constants/colors';
+import { useScreenDimensions } from '../../../hooks/useScreenDimensions';
+import { useEffect, useState } from 'react';
+import { CameraAdapter } from '../../../config/adapters/camera-adapter';
+import { FontAwesome } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { AnimatedButtonCustom } from '../../../ui/components/AnimatedButtonCustom';
+import { Controller, useForm } from 'react-hook-form';
+import ToastService from '../../../services/ToastService';
+import { HomesDropDown } from '../../../ui/components/HomesDropDown';
+import { useHomeStore } from '../../../store/useHomeStore';
+import { HomeAndMembers } from '../../../infraestructure/interfaces/home/home.interfaces';
 
 type ProfileFormInputs = {
   name: string;
@@ -32,46 +23,57 @@ type ProfileFormInputs = {
 };
 
 export default function ProfileScreen() {
-  const { logOut, updateProfile, user, errorMessage } = useAuthStore();
-  const [profileImage, setProfileImage] = useState<string | null>(
-    user?.avatar ?? null
-  );
+  const { logOut, updateProfile, checkToken, user, errorMessage } = useAuthStore();
+  const [profileImage, setProfileImage] = useState<string | null>(user?.avatar ?? null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    reset,
+    formState: { errors }
   } = useForm<ProfileFormInputs>({
     defaultValues: {
-      email: user?.email || "",
-      password: "",
-      name: user?.name || "",
-      phone: user?.phone || "",
+      email: user?.email || '',
+      password: '',
+      name: user?.name || '',
+      phone: user?.phone || ''
     },
-    mode: "onChange",
+    mode: 'onChange'
   });
 
   const { width } = useScreenDimensions();
   const router = useRouter();
 
+  useEffect(() => {
+    if (user && !isSubmitting) {
+      reset({
+        email: user.email,
+        password: '',
+        name: user.name,
+        phone: user.phone
+      });
+      setProfileImage(user?.avatar ?? null);
+    }
+  }, [user]);
+
   const handleSelectImage = () => {
-    Alert.alert("Cambiar foto", "Selecciona una opción", [
+    Alert.alert('Cambiar foto', 'Selecciona una opción', [
       {
-        text: "Cámara",
+        text: 'Cámara',
         onPress: async () => {
           const images = await CameraAdapter.takePicture();
           if (images.length > 0) setProfileImage(images[0]);
-        },
+        }
       },
       {
-        text: "Galería",
+        text: 'Galería',
         onPress: async () => {
           const images = await CameraAdapter.getPicturesFromLibrary();
           if (images.length > 0) setProfileImage(images[0]);
-        },
+        }
       },
-      { text: "Cancelar", style: "cancel" },
+      { text: 'Cancelar', style: 'cancel' }
     ]);
   };
 
@@ -79,31 +81,28 @@ export default function ProfileScreen() {
     setIsSubmitting(true);
 
     const formData = new FormData();
-    formData.append("updateUserDto", JSON.stringify(data));
+    formData.append('updateUserDto', JSON.stringify(data));
 
     console.log({ data });
 
     if (profileImage) {
-      const fileName = profileImage.split("/").pop();
-      formData.append("image", {
+      const fileName = profileImage.split('/').pop();
+      formData.append('image', {
         uri: profileImage,
-        type: "image/jpeg",
-        name: fileName,
+        type: 'image/jpeg',
+        name: fileName
       } as any);
     }
 
     const success = await updateProfile(formData);
 
+    console.log({ success });
+
     if (success) {
-      ToastService.success(
-        "Perfil actualizado",
-        "Tus cambios fueron guardados correctamente"
-      );
+      await checkToken();
+      ToastService.success('Perfil actualizado', 'Tus cambios fueron guardados correctamente');
     } else {
-      ToastService.error(
-        "Error al actualizar",
-        "Verifica tus datos o intenta más tarde."
-      );
+      ToastService.error('Error al actualizar', 'Verifica tus datos o intenta más tarde.');
     }
 
     setIsSubmitting(false);
@@ -113,10 +112,17 @@ export default function ProfileScreen() {
     <MotiViewCustom style={globalStyles.container}>
       <TouchableOpacity onPress={handleSelectImage}>
         {profileImage ? (
-          <Image source={{ uri: profileImage }} style={styles.avatar} />
+          <Image
+            source={{ uri: profileImage }}
+            style={styles.avatar}
+          />
         ) : (
           <View style={styles.avatarPlaceholder}>
-            <FontAwesome name="user" size={40} color="#9CA3AF" />
+            <FontAwesome
+              name="user"
+              size={40}
+              color="#9CA3AF"
+            />
           </View>
         )}
       </TouchableOpacity>
@@ -134,8 +140,8 @@ export default function ProfileScreen() {
           rules={{
             pattern: {
               value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-              message: "Correo inválido.",
-            },
+              message: 'Correo inválido.'
+            }
           }}
           render={({ field: { onChange, value } }) => (
             <TextInput
@@ -151,7 +157,7 @@ export default function ProfileScreen() {
         />
         {errors.email && (
           <MotiViewCustom>
-            <Text style={{ color: "red" }}>{errors.email.message}</Text>
+            <Text style={{ color: 'red' }}>{errors.email.message}</Text>
           </MotiViewCustom>
         )}
 
@@ -161,8 +167,8 @@ export default function ProfileScreen() {
           rules={{
             minLength: {
               value: 6,
-              message: "Mínimo 6 caracteres.",
-            },
+              message: 'Mínimo 6 caracteres.'
+            }
           }}
           render={({ field: { onChange, value } }) => (
             <TextInput
@@ -177,7 +183,7 @@ export default function ProfileScreen() {
         />
         {errors.password && (
           <MotiViewCustom>
-            <Text style={{ color: "red" }}>{errors.password.message}</Text>
+            <Text style={{ color: 'red' }}>{errors.password.message}</Text>
           </MotiViewCustom>
         )}
 
@@ -201,8 +207,8 @@ export default function ProfileScreen() {
           rules={{
             pattern: {
               value: /^\+?[0-9]{7,15}$/,
-              message: "Teléfono inválido.",
-            },
+              message: 'Teléfono inválido.'
+            }
           }}
           render={({ field: { onChange, value } }) => (
             <TextInput
@@ -217,21 +223,21 @@ export default function ProfileScreen() {
         />
         {errors.phone && (
           <MotiViewCustom>
-            <Text style={{ color: "red" }}>{errors.phone.message}</Text>
+            <Text style={{ color: 'red' }}>{errors.phone.message}</Text>
           </MotiViewCustom>
         )}
       </MotiViewCustom>
 
       <AnimatedButtonCustom
         customStyles={{ backgroundColor: colors.primaryLight }}
-        label={isSubmitting ? "Actualizando..." : "Cambiar datos"}
+        label={isSubmitting ? 'Actualizando...' : 'Cambiar datos'}
         onPress={handleSubmit(onSubmit)}
         disabled={isSubmitting}
       />
       <AnimatedButtonCustom
         customStyles={{ backgroundColor: colors.infoBlue }}
         label="Gestionar viviendas"
-        onPress={() => router.push("/(home)/manage-homes")}
+        onPress={() => router.push('/(home)/manage-homes')}
       />
       <AnimatedButtonCustom
         customStyles={{ backgroundColor: colors.accentRed }}
@@ -248,16 +254,16 @@ const styles = StyleSheet.create({
     height: 120,
     borderRadius: 60,
     borderWidth: 2,
-    borderColor: "#ccc",
+    borderColor: '#ccc'
   },
   avatarPlaceholder: {
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: "#E5E7EB",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: '#E5E7EB',
+    justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 2,
-    borderColor: "#ccc",
-  },
+    borderColor: '#ccc'
+  }
 });

@@ -1,12 +1,12 @@
-import { useForm, Controller } from "react-hook-form";
-import { useRouter } from "expo-router";
-import { Text, TextInput, Pressable, View } from "react-native";
-import { MotiViewCustom } from "../../ui/components/MotiViewCustom";
-import { authStyles } from "../../ui/styles/auth.styles";
-import { useAuthStore } from "../../store/useAuthStore";
-import { APP_ROUTES, AUTH_ROUTES } from "../../constants/routes";
-import { globalStyles } from "../../constants/styles";
-import { useState } from "react";
+import { useForm, Controller } from 'react-hook-form';
+import { useRouter } from 'expo-router';
+import { Text, TextInput, Pressable, View } from 'react-native';
+import { MotiViewCustom } from '../../ui/components/MotiViewCustom';
+import { authStyles } from '../../ui/styles/auth.styles';
+import { useAuthStore } from '../../store/useAuthStore';
+import { APP_ROUTES, AUTH_ROUTES } from '../../constants/routes';
+import { globalStyles } from '../../constants/styles';
+import { useState } from 'react';
 
 type RegisterFormInputs = {
   email: string;
@@ -17,29 +17,29 @@ type RegisterFormInputs = {
 
 export default function RegisterScreen() {
   const router = useRouter();
-  const [errorApi, setErrorApi] = useState("");
+  const [errorApi, setErrorApi] = useState('');
   const { register, errorMessage } = useAuthStore();
 
   const {
     control,
     handleSubmit,
-    formState: { errors },
+    formState: { errors }
   } = useForm<RegisterFormInputs>({
     defaultValues: {
-      email: "prueba@prueba.com",
-      password: "seguroMucho123",
-      confirmPassword: "seguroMucho123",
-      name: "Antonio",
+      email: 'prueba@prueba.com',
+      password: 'seguroMucho123',
+      confirmPassword: 'seguroMucho123',
+      name: 'Antonio'
     },
-    mode: "onChange",
+    mode: 'onChange'
   });
 
   const onSubmit = async (data: RegisterFormInputs) => {
-    setErrorApi("");
+    setErrorApi('');
     const { name, email, password, confirmPassword } = data;
 
     if (password !== confirmPassword) {
-      setErrorApi("Las contraseñas no coinciden.");
+      setErrorApi('Las contraseñas no coinciden.');
       return;
     }
 
@@ -48,7 +48,7 @@ export default function RegisterScreen() {
     console.log({ success });
 
     if (!success) {
-      setErrorApi("Error al registrar.");
+      setErrorApi('Error al registrar.');
     } else {
       router.replace(APP_ROUTES.home);
     }
@@ -62,9 +62,7 @@ export default function RegisterScreen() {
     <MotiViewCustom style={globalStyles.container}>
       <MotiViewCustom style={authStyles.header}>
         <Text style={authStyles.title}>HOGAR+</Text>
-        <Text style={authStyles.subtitle}>
-          Organización y armonía, todo en un solo lugar.
-        </Text>
+        <Text style={authStyles.subtitle}>Organización y armonía, todo en un solo lugar.</Text>
       </MotiViewCustom>
 
       {errorMessage && (
@@ -75,16 +73,15 @@ export default function RegisterScreen() {
 
       <MotiViewCustom style={authStyles.toggleContainer}>
         <Pressable style={authStyles.toggleButton}>
-          <Text style={authStyles.toggleText} onPress={handleToLogin}>
+          <Text
+            style={authStyles.toggleText}
+            onPress={handleToLogin}
+          >
             Inicio
           </Text>
         </Pressable>
-        <Pressable
-          style={[authStyles.toggleButton, authStyles.toggleButtonActive]}
-        >
-          <Text style={[authStyles.toggleText, authStyles.toggleTextActive]}>
-            Registro
-          </Text>
+        <Pressable style={[authStyles.toggleButton, authStyles.toggleButtonActive]}>
+          <Text style={[authStyles.toggleText, authStyles.toggleTextActive]}>Registro</Text>
         </Pressable>
       </MotiViewCustom>
 
@@ -93,11 +90,11 @@ export default function RegisterScreen() {
           control={control}
           name="email"
           rules={{
-            required: "El correo es obligatorio.",
+            required: 'El correo es obligatorio.',
             pattern: {
               value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-              message: "Correo inválido.",
-            },
+              message: 'Correo inválido.'
+            }
           }}
           render={({ field: { onChange, value } }) => (
             <TextInput
@@ -111,21 +108,17 @@ export default function RegisterScreen() {
             />
           )}
         />
-        <MotiViewCustom>
-          {errors.email && (
-            <Text style={{ color: "red" }}>{errors.email.message}</Text>
-          )}
-        </MotiViewCustom>
+        <MotiViewCustom>{errors.email && <Text style={{ color: 'red' }}>{errors.email.message}</Text>}</MotiViewCustom>
 
         <Controller
           control={control}
           name="password"
           rules={{
-            required: "La contraseña es obligatoria.",
+            required: 'La contraseña es obligatoria.',
             minLength: {
               value: 6,
-              message: "Mínimo 6 caracteres.",
-            },
+              message: 'Mínimo 6 caracteres.'
+            }
           }}
           render={({ field: { onChange, value } }) => (
             <TextInput
@@ -139,20 +132,18 @@ export default function RegisterScreen() {
           )}
         />
         <MotiViewCustom>
-          {errors.password && (
-            <Text style={{ color: "red" }}>{errors.password.message}</Text>
-          )}
+          {errors.password && <Text style={{ color: 'red' }}>{errors.password.message}</Text>}
         </MotiViewCustom>
 
         <Controller
           control={control}
           name="confirmPassword"
           rules={{
-            required: "La contraseña es obligatoria.",
+            required: 'La contraseña es obligatoria.',
             minLength: {
               value: 6,
-              message: "Mínimo 6 caracteres.",
-            },
+              message: 'Mínimo 6 caracteres.'
+            }
           }}
           render={({ field: { onChange, value } }) => (
             <TextInput
@@ -165,19 +156,15 @@ export default function RegisterScreen() {
             />
           )}
         />
-        <MotiViewCustom transition={{ type: "timing", duration: 1000 }}>
-          {errors.confirmPassword && (
-            <Text style={{ color: "red" }}>
-              {errors.confirmPassword.message}
-            </Text>
-          )}
+        <MotiViewCustom transition={{ type: 'timing', duration: 1000 }}>
+          {errors.confirmPassword && <Text style={{ color: 'red' }}>{errors.confirmPassword.message}</Text>}
         </MotiViewCustom>
 
         <Controller
           control={control}
           name="name"
           rules={{
-            required: "El nombre es obligatorio.",
+            required: 'El nombre es obligatorio.'
           }}
           render={({ field: { onChange, value } }) => (
             <TextInput
@@ -189,10 +176,8 @@ export default function RegisterScreen() {
             />
           )}
         />
-        <MotiViewCustom transition={{ type: "timing", duration: 1000 }}>
-          {errors.name && (
-            <Text style={{ color: "red" }}>{errors.name.message}</Text>
-          )}
+        <MotiViewCustom transition={{ type: 'timing', duration: 1000 }}>
+          {errors.name && <Text style={{ color: 'red' }}>{errors.name.message}</Text>}
         </MotiViewCustom>
       </MotiViewCustom>
 

@@ -20,7 +20,7 @@ export const HomesDropDown = ({ getHomesAndMembers, setCurrentHouse, currentHous
   const fetchHousesAndMembers = async () => {
     const resp = await getHomesAndMembers();
     if (!resp) {
-      console.error('Error fetching houses and members');
+      // console.error('Error fetching houses and members');
       return;
     }
   };

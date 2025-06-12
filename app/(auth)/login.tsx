@@ -23,9 +23,11 @@ export default function LoginScreen() {
     formState: { errors }
   } = useForm<LoginFormInputs>({
     defaultValues: {
-      email: 'antonio@example.com',
+      // email: 'antonio@example.com',
+      email: 'juan.perez@ejemplo.com',
       // email: 'antonio@example4kfng.com',
-      password: 'supersegura123'
+      // password: 'supersegura123'
+      password: 'strongpassword123'
     },
     mode: 'onChange'
   });
@@ -44,7 +46,7 @@ export default function LoginScreen() {
     console.log({ success });
 
     if (!success) {
-      setErrorApi('Error al registrar.');
+      setErrorApi('Error al logear.');
     } else {
       router.replace(APP_ROUTES.home);
     }

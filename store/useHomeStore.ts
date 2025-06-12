@@ -1,28 +1,19 @@
-import { create } from "zustand";
+import { create } from 'zustand';
 import {
   deleteHome,
   exitFromHome,
   deletePersonFromHome,
   joinHome,
-  getHomesAndMembersByUser,
-} from "../action/home/home.action";
-import {
-  createHome,
-  getHomeDetails,
-  getHomesByUser,
-} from "../action/home/home.action";
-import {
-  Home,
-  HomeAndMembers,
-  HomeDetails,
-  HomesByUser,
-} from "../infraestructure/interfaces/home/home.interfaces";
-import { StorageAdapter } from "../config/adapters/async-storage";
+  getHomesAndMembersByUser
+} from '../action/home/home.action';
+import { createHome, getHomeDetails, getHomesByUser } from '../action/home/home.action';
+import { Home, HomeAndMembers, HomeDetails, HomesByUser } from '../infraestructure/interfaces/home/home.interfaces';
+import { StorageAdapter } from '../config/adapters/async-storage';
 
 interface HomeState {
   isLoading: boolean;
   homeCreated?: Home;
-  homesByUser?: HomesByUser[];
+  homesByUser: HomesByUser[];
   currentHome?: HomeAndMembers;
   homeDetails: Record<number, HomeDetails>;
   housesAndMembers?: HomeAndMembers[];
@@ -39,6 +30,7 @@ interface HomeState {
   getHomesAndMembers: () => Promise<boolean>;
   setCurrentHome: (home: HomeAndMembers) => void;
   getCurrentHome: () => Promise<HomeAndMembers | undefined>;
+  refreshData: () => Promise<boolean>;
 }
 
 export const useHomeStore = create<HomeState>((set, get) => ({
@@ -50,16 +42,40 @@ export const useHomeStore = create<HomeState>((set, get) => ({
   currentHome: undefined,
   homeDetails: {},
   homes: [],
-  createHome: async (homeName: string) => {
-    const resp = await createHome(homeName);
+  refreshData: async () => {
+    set({ isLoading: true });
+    const resp = await getHomesByUser();
 
     if (!resp) {
-      set({ errorMessage: "Error inesperado" });
+      set({ errorMessage: 'Error inesperado', isLoading: false });
       return false;
     }
 
     if (!resp.ok) {
-      set({ errorMessage: resp.message });
+      set({ errorMessage: resp.message, isLoading: false });
+      return false;
+    }
+
+    set({
+      homesByUser: resp.data.homes,
+      housesAndMembers: [],
+      isLoading: false,
+      errorMessage: undefined
+    });
+    return true;
+  },
+  createHome: async (homeName: string) => {
+    set({ isLoading: true });
+
+    const resp = await createHome(homeName);
+
+    if (!resp) {
+      set({ errorMessage: 'Error inesperado', isLoading: false });
+      return false;
+    }
+
+    if (!resp.ok) {
+      set({ errorMessage: resp.message, isLoading: false });
       return false;
     }
 
@@ -67,18 +83,22 @@ export const useHomeStore = create<HomeState>((set, get) => ({
       id: resp.data.home.id,
       name: resp.data.home.name,
       isAdmin: true,
-      invitationCode: resp.data.home.invitationCode,
+      invitationCode: resp.data.home.invitationCode
     };
 
-    set((state) => ({
+    console.log('CreateHome', JSON.stringify(resp.data.home, null, 2));
+
+    set(state => ({
       homeCreated: resp.data.home,
-      homesByUser: state.homesByUser?.concat(homeByUser),
+      // homesByUser: state.homesByUser?.concat(homeByUser),
+      homesByUser: [...(state.homesByUser || []), homeByUser],
       errorMessage: undefined,
+      isLoading: false
     }));
     return true;
   },
   getCurrentHome: async () => {
-    const resp = await StorageAdapter.getItem("currentHome");
+    const resp = await StorageAdapter.getItem('currentHome');
 
     if (!resp) {
       return undefined;
@@ -97,7 +117,7 @@ export const useHomeStore = create<HomeState>((set, get) => ({
     const resp = await getHomesByUser();
 
     if (!resp) {
-      set({ errorMessage: "Error inesperado", isLoading: false });
+      set({ errorMessage: 'Error inesperado', isLoading: false });
       return false;
     }
 
@@ -106,10 +126,13 @@ export const useHomeStore = create<HomeState>((set, get) => ({
       return false;
     }
 
+    console.log('getHomesByUser', JSON.stringify(resp.data.homes, null, 2));
+
     set({
       homesByUser: resp.data.homes,
+      housesAndMembers: [],
       isLoading: false,
-      errorMessage: undefined,
+      errorMessage: undefined
     });
     return true;
   },
@@ -117,7 +140,7 @@ export const useHomeStore = create<HomeState>((set, get) => ({
     const resp = await getHomeDetails(homeId);
 
     if (!resp) {
-      set({ errorMessage: "Error inesperado" });
+      set({ errorMessage: 'Error inesperado' });
       return false;
     }
 
@@ -126,12 +149,12 @@ export const useHomeStore = create<HomeState>((set, get) => ({
       return false;
     }
 
-    set((state) => ({
+    set(state => ({
       homeDetails: {
         ...state.homeDetails,
-        [homeId]: resp.data.home,
+        [homeId]: resp.data.home
       },
-      errorMessage: undefined,
+      errorMessage: undefined
     }));
     return true;
   },
@@ -141,7 +164,7 @@ export const useHomeStore = create<HomeState>((set, get) => ({
     const resp = await deleteHome(homeId);
 
     if (!resp) {
-      set({ errorMessage: "Error inesperado", isLoading: false });
+      set({ errorMessage: 'Error inesperado', isLoading: false });
       return false;
     }
 
@@ -150,17 +173,16 @@ export const useHomeStore = create<HomeState>((set, get) => ({
       return false;
     }
 
-    set((state) => ({
-      homesByUser: state.homesByUser?.filter((h) => h.id !== homeId),
-      homeDetails: Object.fromEntries(
-        Object.entries(state.homeDetails).filter(
-          ([key]) => Number(key) !== homeId
-        )
-      ),
+    set(state => ({
+      // homesByUser: state.homesByUser?.filter(h => h.id !== homeId),
+      homesByUser: (state.homesByUser || []).filter(h => h.id !== homeId),
+      homeDetails: Object.fromEntries(Object.entries(state.homeDetails).filter(([key]) => Number(key) !== homeId)),
       isLoading: false,
       errorMessage: undefined,
-      idHomeToDelete: undefined,
+      idHomeToDelete: undefined
     }));
+
+    console.log('ELIMINACION YA TERMINADA');
     return true;
   },
   exitFromHome: async (homeId: number) => {
@@ -169,7 +191,7 @@ export const useHomeStore = create<HomeState>((set, get) => ({
     const resp = await exitFromHome(homeId);
 
     if (!resp) {
-      set({ errorMessage: "Error inesperado", isLoading: false });
+      set({ errorMessage: 'Error inesperado', isLoading: false });
       return false;
     }
 
@@ -178,17 +200,28 @@ export const useHomeStore = create<HomeState>((set, get) => ({
       return false;
     }
 
-    set((state) => ({
-      homesByUser: state.homesByUser?.filter((h) => h.id !== homeId),
-      homeDetails: Object.fromEntries(
-        Object.entries(state.homeDetails).filter(
-          ([key]) => Number(key) !== homeId
-        )
-      ),
+    const homes = get().homesByUser;
+    console.log('homes', JSON.stringify(homes, null, 2));
+
+    console.log(
+      'homesFIltered',
+      JSON.stringify(
+        homes.filter(h => h.id !== homeId),
+        null,
+        2
+      )
+    );
+
+    set(state => ({
+      // homesByUser: state.homesByUser?.filter(h => h.id !== homeId),
+      homesByUser: homes.filter(h => h.id !== homeId),
+      homeDetails: Object.fromEntries(Object.entries(state.homeDetails).filter(([key]) => Number(key) !== homeId)),
       isLoading: false,
       errorMessage: undefined,
-      idHomeToDelete: undefined,
+      idHomeToDelete: undefined
     }));
+
+    console.log('ACTUALIZACION YA TERMINADA');
     return true;
   },
 
@@ -198,7 +231,7 @@ export const useHomeStore = create<HomeState>((set, get) => ({
     const resp = await deletePersonFromHome(homeId, memberId);
 
     if (!resp) {
-      set({ errorMessage: "Error inesperado", isLoading: false });
+      set({ errorMessage: 'Error inesperado', isLoading: false });
       return false;
     }
 
@@ -207,16 +240,12 @@ export const useHomeStore = create<HomeState>((set, get) => ({
       return false;
     }
 
-    set((state) => ({
-      homesByUser: state.homesByUser?.filter((h) => h.id !== homeId),
-      homeDetails: Object.fromEntries(
-        Object.entries(state.homeDetails).filter(
-          ([key]) => Number(key) !== homeId
-        )
-      ),
+    set(state => ({
+      homesByUser: state.homesByUser?.filter(h => h.id !== homeId),
+      homeDetails: Object.fromEntries(Object.entries(state.homeDetails).filter(([key]) => Number(key) !== homeId)),
       errorMessage: undefined,
       isLoading: false,
-      idHomeToDelete: undefined,
+      idHomeToDelete: undefined
     }));
     return true;
   },
@@ -227,7 +256,7 @@ export const useHomeStore = create<HomeState>((set, get) => ({
     const resp = await joinHome(invitationCode);
 
     if (!resp) {
-      set({ errorMessage: "Error inesperado", isLoading: false });
+      set({ errorMessage: 'Error inesperado', isLoading: false });
       return false;
     }
 
@@ -236,10 +265,10 @@ export const useHomeStore = create<HomeState>((set, get) => ({
       return false;
     }
 
-    set((state) => ({
+    set(state => ({
       errorMessage: undefined,
       isLoading: false,
-      idHomeToDelete: undefined,
+      idHomeToDelete: undefined
     }));
     return true;
   },
@@ -252,7 +281,7 @@ export const useHomeStore = create<HomeState>((set, get) => ({
     console.log({ resp });
 
     if (!resp) {
-      set({ errorMessage: "Error inesperado", isLoading: false });
+      set({ errorMessage: 'Error inesperado', isLoading: false });
       return false;
     }
 
@@ -261,11 +290,11 @@ export const useHomeStore = create<HomeState>((set, get) => ({
       return false;
     }
 
-    set((state) => ({
+    set(state => ({
       housesAndMembers: resp.data.homes,
       errorMessage: undefined,
-      isLoading: false,
+      isLoading: false
     }));
     return true;
-  },
+  }
 }));

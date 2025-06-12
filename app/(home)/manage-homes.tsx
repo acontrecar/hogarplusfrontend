@@ -2,7 +2,7 @@ import { View, Text, StyleSheet, ScrollView, RefreshControl } from 'react-native
 import { MotiViewCustom } from '../../ui/components/MotiViewCustom';
 import { globalStyles } from '../../constants/styles';
 import { AnimatedButtonCustom } from '../../ui/components/AnimatedButtonCustom';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import ToastService from '../../services/ToastService';
 import { Link } from 'expo-router';
 import { useHomeStore } from '../../store/useHomeStore';
@@ -13,21 +13,19 @@ import { HomeCard } from '../../ui/components/HomeCard';
 import { HomeDisplay } from '../../ui/components/HomeDisplay';
 import Entypo from '@expo/vector-icons/Entypo';
 import Loader from '../loader';
+import { LinearTransition, default as Reanimated } from 'react-native-reanimated';
 
 export default function ManageHomesScreen() {
-  const [visibleModal, setVisibleModal] = useState(true);
-  const [homesMember, setHomesMember] = useState<HomesByUser[]>([]);
-  const [homesAdmin, setHomesAdmin] = useState<HomesByUser[]>([]);
+  const { isLoading, homesByUser = [], errorMessage, getHomesByUser } = useHomeStore();
 
-  const { isLoading, homesByUser, errorMessage, getHomesByUser } = useHomeStore();
-
-  const refresh = async () => {
+  const refresh = useCallback(async () => {
+    console.log('Se ha llamado a refresh');
     await getHomesByUser();
-  };
+  }, [getHomesByUser]);
 
   useEffect(() => {
     refresh();
-  }, []);
+  }, [refresh]);
 
   useEffect(() => {
     if (errorMessage) {
@@ -35,67 +33,65 @@ export default function ManageHomesScreen() {
     }
   }, [errorMessage]);
 
-  useEffect(() => {
-    if (homesByUser?.length === 0) return;
-    const adminHomes = homesByUser?.filter(h => h.isAdmin);
-    const memberHomes = homesByUser?.filter(h => !h.isAdmin);
+  const homesAdmin = useMemo(() => homesByUser.filter(h => h.isAdmin), [homesByUser]);
 
-    setHomesAdmin(adminHomes ?? []);
-    setHomesMember(memberHomes ?? []);
-  }, [homesByUser]);
+  const homesMember = useMemo(() => homesByUser.filter(h => !h.isAdmin), [homesByUser]);
 
   return (
-    <>
-      {isLoading ? (
-        <Loader />
-      ) : (
-        <MotiViewCustom style={globalStyles.container}>
-          <ScrollView
-            refreshControl={
-              <RefreshControl
-                refreshing={isLoading}
-                onRefresh={async () => {
-                  await refresh();
-                }}
-              />
-            }
-            showsVerticalScrollIndicator={false}
-            contentContainerStyle={styles.scrollContainer}
-            bounces={false}
-            style={{
-              flex: 1,
-              width: '100%',
-              height: '100%',
-              marginBottom: 70
+    <MotiViewCustom style={globalStyles.container}>
+      <ScrollView
+        refreshControl={
+          <RefreshControl
+            refreshing={isLoading}
+            onRefresh={async () => {
+              await refresh();
             }}
+          />
+        }
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContainer}
+        bounces={false}
+        style={{
+          flex: 1,
+          width: '100%',
+          height: '100%'
+          // marginBottom: 60,
+        }}
+      >
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <Link
+            href="/(home)/(modals)/create-home"
+            asChild
           >
-            <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-              <Link
-                href="/(home)/(modals)/create-home"
-                asChild
-              >
-                <AnimatedButtonCustom
-                  customStyles={{ width: '45%' }}
-                  label="Crear hogar"
-                  onPress={() => {}}
-                />
-              </Link>
+            <AnimatedButtonCustom
+              customStyles={{ width: '45%' }}
+              label="Crear hogar"
+              onPress={() => {}}
+            />
+          </Link>
 
-              <Link
-                href="/(home)/(modals)/search-home"
-                asChild
-              >
-                <AnimatedButtonCustom
-                  customStyles={{
-                    width: '45%',
-                    backgroundColor: colors.infoBlue
-                  }}
-                  label="Buscar hogar"
-                  onPress={() => {}}
-                />
-              </Link>
-            </View>
+          <Link
+            href="/(home)/(modals)/search-home"
+            asChild
+          >
+            <AnimatedButtonCustom
+              customStyles={{
+                width: '45%',
+                backgroundColor: colors.infoBlue
+              }}
+              label="Buscar hogar"
+              onPress={() => {}}
+            />
+          </Link>
+        </View>
 
+        {isLoading && homesByUser?.length === 0 ? (
+          <Loader />
+        ) : (
+          <Reanimated.View
+            layout={LinearTransition}
+            style={{ flex: 1, width: '100%', height: '100%' }}
+          >
             {homesAdmin.length > 0 && (
               <HomeDisplay
                 homes={homesAdmin}
@@ -124,10 +120,10 @@ export default function ManageHomesScreen() {
                 roll="member"
               />
             )}
-          </ScrollView>
-        </MotiViewCustom>
-      )}
-    </>
+          </Reanimated.View>
+        )}
+      </ScrollView>
+    </MotiViewCustom>
   );
 }
 
