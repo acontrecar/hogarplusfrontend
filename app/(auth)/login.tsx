@@ -23,11 +23,11 @@ export default function LoginScreen() {
     formState: { errors }
   } = useForm<LoginFormInputs>({
     defaultValues: {
-      // email: 'antonio@example.com',
-      email: 'juan.perez@ejemplo.com',
+      email: 'antonio@example.com',
+      // email: 'juan.perez@ejemplo.com',
       // email: 'antonio@example4kfng.com',
-      // password: 'supersegura123'
-      password: 'strongpassword123'
+      password: 'supersegura123'
+      // password: 'strongpassword123'
     },
     mode: 'onChange'
   });

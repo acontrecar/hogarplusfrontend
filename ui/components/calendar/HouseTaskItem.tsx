@@ -22,7 +22,6 @@ import ToastService from '../../../services/ToastService';
 import { default as Reanimated } from 'react-native-reanimated';
 
 const HouseTaskItem = ({ task }: { task: Task }) => {
-  const { completeTask } = useHousesStore();
   const { user } = useAuthStore();
   const { deleteTask, compleTask } = useTaskStore();
 
@@ -35,6 +34,10 @@ const HouseTaskItem = ({ task }: { task: Task }) => {
     id: u.id,
     name: u.name
   }));
+
+  // console.log('task', JSON.stringify(task, null, 2));
+  // console.log('assignedTo', JSON.stringify(task.assignedTo, null, 2));
+  // console.log('assignedUsers', JSON.stringify(assignedUsers, null, 2));
 
   const getPriorityColor = () => {
     switch (task.priority) {

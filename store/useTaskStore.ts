@@ -47,8 +47,9 @@ export const useTaskStore = create<TaskState>(set => ({
       set({ errorMessage: resp.message, isLoading: false });
       return false;
     }
+    console.log('resp', JSON.stringify(resp.data.tasks, null, 2));
 
-    set({ isLoading: false, errorMessage: undefined, tasks: resp.data.tasks });
+    set({ tasks: resp.data.tasks, isLoading: false, errorMessage: undefined });
     return true;
   },
   createTask: async (createTask: CreateTaskDto) => {

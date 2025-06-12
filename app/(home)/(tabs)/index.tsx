@@ -39,8 +39,8 @@ export default function HomeScreen() {
           <DebtSummary houseId={currentHouse.id.toString()} />
         </ScrollView>
       ) : (
-        <View style={{ alignItems: 'center', marginTop: 20 }}>
-          <Text>Seleccione un hogar</Text>
+        <View style={styles.emptyContainer}>
+          <Text style={styles.emptyText}>Seleccione un hogar...</Text>
         </View>
       )}
     </Reanimated.View>
@@ -61,5 +61,16 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     paddingBottom: 50
+  },
+  emptyContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20
+  },
+  emptyText: {
+    fontSize: 16,
+    color: '#718096',
+    textAlign: 'center'
   }
 });
