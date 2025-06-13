@@ -74,7 +74,6 @@ export const HomeCard = ({ home, roll }: HomeCardProps) => {
   };
 
   const deletePerson = async (homeId: number, memberId: number) => {
-    console.log({ homeId, memberId });
     const success = await deletePersonFromHome(homeId, memberId);
 
     if (success) {

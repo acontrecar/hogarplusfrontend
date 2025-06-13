@@ -81,7 +81,6 @@ export const useDebtStore = create<DebtsState>(set => ({
 
     // set({ isLoading: false, errorMessage: undefined });
     const { debtMember } = resp.data;
-    console.log(JSON.stringify(debtMember, null, 2));
 
     set(state => ({
       isLoading: false,

@@ -43,8 +43,6 @@ export default function LoginScreen() {
 
     const success = await logIn(email, password);
 
-    console.log({ success });
-
     if (!success) {
       setErrorApi('Error al logear.');
     } else {

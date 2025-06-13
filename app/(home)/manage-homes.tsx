@@ -19,7 +19,6 @@ export default function ManageHomesScreen() {
   const { isLoading, homesByUser = [], errorMessage, getHomesByUser } = useHomeStore();
 
   const refresh = useCallback(async () => {
-    console.log('Se ha llamado a refresh');
     await getHomesByUser();
   }, [getHomesByUser]);
 

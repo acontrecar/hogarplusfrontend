@@ -228,8 +228,6 @@ export const useHomeStore = create<HomeState>((set, get) => ({
 
     const resp = await getHomesAndMembersByUser();
 
-    console.log({ resp });
-
     if (!resp) {
       set({ errorMessage: 'Error inesperado', isLoading: false });
       return false;

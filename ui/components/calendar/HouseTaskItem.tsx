@@ -35,10 +35,6 @@ const HouseTaskItem = ({ task }: { task: Task }) => {
     name: u.name
   }));
 
-  // console.log('task', JSON.stringify(task, null, 2));
-  // console.log('assignedTo', JSON.stringify(task.assignedTo, null, 2));
-  // console.log('assignedUsers', JSON.stringify(assignedUsers, null, 2));
-
   const getPriorityColor = () => {
     switch (task.priority) {
       case 'high':

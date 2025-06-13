@@ -56,8 +56,6 @@ export default function DebtsScreen() {
       ? form.affectedMemberIds.filter(id => id !== memberId)
       : [...form.affectedMemberIds, memberId];
 
-    console.log('newSelection', newSelection);
-
     setForm({ ...form, affectedMemberIds: newSelection });
     if (newSelection.length > 0 && errors.members && errors.members.length > 0) {
       setErrors({ ...errors, members: '' });
@@ -169,8 +167,6 @@ export default function DebtsScreen() {
       affectedMemberIds: form.affectedMemberIds,
       homeId: currentHouse ? currentHouse.id : 0
     };
-
-    console.log('debt', JSON.stringify(debt, null, 2));
 
     const success = await createDebt(debt);
 

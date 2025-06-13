@@ -1,5 +1,14 @@
 import React, { useEffect } from 'react';
-import { FlatList, Pressable, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import {
+  FlatList,
+  Pressable,
+  RefreshControl,
+  ScrollView,
+  StyleSheet,
+  Text,
+  TouchableOpacity,
+  View
+} from 'react-native';
 import { FadeIn, FadeOut, default as Reanimated } from 'react-native-reanimated';
 import { HomesDropDown } from '../../../ui/components/HomesDropDown';
 import { useHomeStore } from '../../../store/useHomeStore';
@@ -7,7 +16,7 @@ import { TaskSummary } from '../../../ui/components/TaskSummary';
 import { DebtSummary } from '../../../ui/components/DebtSummary';
 
 export default function HomeScreen() {
-  const { housesAndMembers, getHomesAndMembers } = useHomeStore();
+  const { housesAndMembers, isLoading, getHomesAndMembers } = useHomeStore();
   const [currentHouse, setCurrentHouse] = React.useState<any>(null);
 
   useEffect(() => {
@@ -34,6 +43,14 @@ export default function HomeScreen() {
           contentContainerStyle={styles.scrollContent}
           style={styles.scrollView}
           showsVerticalScrollIndicator={false}
+          refreshControl={
+            <RefreshControl
+              refreshing={isLoading}
+              onRefresh={() => {
+                getHomesAndMembers();
+              }}
+            />
+          }
         >
           <TaskSummary houseId={currentHouse.id.toString()} />
           <DebtSummary houseId={currentHouse.id.toString()} />

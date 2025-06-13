@@ -1,7 +1,7 @@
-import { useRouter } from "expo-router";
-import { useAuthStore } from "../store/useAuthStore";
-import { PropsWithChildren, useEffect } from "react";
-import { APP_ROUTES, AUTH_ROUTES, LOADER_ROUTES } from "../constants/routes";
+import { useRouter } from 'expo-router';
+import { useAuthStore } from '../store/useAuthStore';
+import { PropsWithChildren, useEffect } from 'react';
+import { APP_ROUTES, AUTH_ROUTES, LOADER_ROUTES } from '../constants/routes';
 
 export const AuthProvider = ({ children }: PropsWithChildren) => {
   const router = useRouter();
@@ -11,11 +11,9 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
     const checkAuth = async () => {
       checkToken();
 
-      console.log({ status });
-
-      if (status === "authenticated") {
+      if (status === 'authenticated') {
         router.replace(APP_ROUTES.home);
-      } else if (status === "unauthenticated") {
+      } else if (status === 'unauthenticated') {
         router.replace(AUTH_ROUTES.login);
       } else {
         router.replace(LOADER_ROUTES.loader);

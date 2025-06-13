@@ -79,7 +79,7 @@ export default function CalendarScreen() {
   }, [currentHouse]);
 
   useEffect(() => {
-    console.log('Tasks loaded:', JSON.stringify(tasks, null, 2));
+    // console.log('Tasks loaded:', JSON.stringify(tasks, null, 2));
   }, [tasks]);
 
   // Generar secciones para AgendaList
@@ -106,7 +106,6 @@ export default function CalendarScreen() {
   }, []);
 
   const onDateChanged = (date: string) => {
-    console.log('Date changed to:', date);
     setCurrentDate(date);
   };
 

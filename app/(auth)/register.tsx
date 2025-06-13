@@ -45,8 +45,6 @@ export default function RegisterScreen() {
 
     const success = await register(name, email, password);
 
-    console.log({ success });
-
     if (!success) {
       setErrorApi('Error al registrar.');
     } else {

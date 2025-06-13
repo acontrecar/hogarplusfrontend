@@ -50,7 +50,6 @@ export default function CreateDebtModal() {
     if (currentDebt) {
       setIsCreditor(currentDebt.creditor.id === user.id);
       setIsAffected(currentDebt.affectedMembers.some(m => m.id === user.id && !m.isPaid));
-      console.log(JSON.stringify(currentDebt, null, 2));
     }
   }, [currentDebt]);
 
