@@ -13,7 +13,7 @@ import * as SplashScreen from 'expo-splash-screen';
 SplashScreen.preventAutoHideAsync();
 
 SplashScreen.setOptions({
-  duration: 1000,
+  duration: 400,
   fade: true
 });
 
@@ -24,7 +24,7 @@ export default function RootLayout() {
     async function prepare() {
       try {
         // Simulación de precarga
-        await new Promise(resolve => setTimeout(resolve, 2000));
+        await new Promise(resolve => setTimeout(resolve, 1000));
       } catch (e) {
         console.warn(e);
       } finally {
@@ -47,8 +47,8 @@ export default function RootLayout() {
 
   return (
     <SafeAreaProvider onLayout={onLayoutRootView}>
-      <AuthProvider>
-        <GestureHandlerRootView style={{ flex: 1 }}>
+      <GestureHandlerRootView style={{ flex: 1 }}>
+        <AuthProvider>
           <PaperProvider>
             {/* <QueryProvider> */}
             {/* <SafeAreaView
@@ -62,8 +62,8 @@ export default function RootLayout() {
             {/* </SafeAreaView> */}
             {/* </QueryProvider> */}
           </PaperProvider>
-        </GestureHandlerRootView>
-      </AuthProvider>
+        </AuthProvider>
+      </GestureHandlerRootView>
     </SafeAreaProvider>
   );
 }

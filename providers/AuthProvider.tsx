@@ -19,6 +19,7 @@ export const AuthProvider = ({ children }: PropsWithChildren) => {
         router.replace(LOADER_ROUTES.loader);
       }
     };
+    console.log({ status });
 
     checkAuth();
   }, [status]);
