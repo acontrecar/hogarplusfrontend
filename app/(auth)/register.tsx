@@ -18,7 +18,7 @@ type RegisterFormInputs = {
 export default function RegisterScreen() {
   const router = useRouter();
   const [errorApi, setErrorApi] = useState('');
-  const { register, errorMessage } = useAuthStore();
+  const { register, errorMessage, isLoading } = useAuthStore();
 
   const {
     control,
@@ -183,8 +183,9 @@ export default function RegisterScreen() {
         <Pressable
           style={authStyles.formButton}
           onPress={handleSubmit(onSubmit)}
+          disabled={isLoading}
         >
-          <Text style={authStyles.formButtonText}>Iniciar sesión</Text>
+          <Text style={authStyles.formButtonText}>{isLoading ? 'Registrando...' : 'Registrar'}</Text>
         </Pressable>
       </MotiViewCustom>
     </MotiViewCustom>

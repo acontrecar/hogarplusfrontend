@@ -16,7 +16,7 @@ type LoginFormInputs = {
 export default function LoginScreen() {
   const router = useRouter();
   const [errorApi, setErrorApi] = useState('');
-  const { logIn, errorMessage } = useAuthStore();
+  const { isLoading, logIn, errorMessage } = useAuthStore();
   const {
     control,
     handleSubmit,
@@ -134,8 +134,9 @@ export default function LoginScreen() {
         <Pressable
           style={authStyles.formButton}
           onPress={handleSubmit(onSubmit)}
+          disabled={isLoading}
         >
-          <Text style={authStyles.formButtonText}>Iniciar sesión</Text>
+          <Text style={authStyles.formButtonText}>{isLoading ? 'Iniciando sesión...' : 'Iniciar sesión'}</Text>
         </Pressable>
       </MotiViewCustom>
     </MotiViewCustom>

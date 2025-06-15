@@ -7,6 +7,7 @@ import { StorageAdapter } from '../config/adapters/async-storage';
 import { updateUserProfile } from '../action/user/user.action';
 
 interface AuthState {
+  isLoading: boolean;
   status: AuthStatus;
   token?: string;
   user?: User;
@@ -20,6 +21,7 @@ interface AuthState {
 }
 
 export const useAuthStore = create<AuthState>(set => ({
+  isLoading: false,
   status: 'checking',
   token: undefined,
   user: undefined,
@@ -44,15 +46,16 @@ export const useAuthStore = create<AuthState>(set => ({
   },
 
   register: async (name: string, email: string, password: string) => {
+    set({ errorMessage: undefined, isLoading: true });
     const resp = await authRegister(name, email, password);
 
     if (!resp) {
-      set({ errorMessage: 'Error inesperado' });
+      set({ errorMessage: 'Error inesperado', isLoading: false });
       return false;
     }
 
     if (!resp.ok) {
-      set({ errorMessage: resp.message });
+      set({ errorMessage: resp.message, isLoading: false });
       return false;
     }
 
@@ -62,7 +65,8 @@ export const useAuthStore = create<AuthState>(set => ({
       status: 'authenticated',
       token: resp.data.token,
       user: resp.data.user,
-      errorMessage: undefined
+      errorMessage: undefined,
+      isLoading: false
     });
 
     return true;
@@ -74,15 +78,16 @@ export const useAuthStore = create<AuthState>(set => ({
   },
 
   logIn: async (email: string, password: string) => {
+    set({ errorMessage: undefined, isLoading: false });
     const resp = await authLogin(email, password);
 
     if (!resp) {
-      set({ status: 'unauthenticated', token: undefined, user: undefined });
+      set({ status: 'unauthenticated', token: undefined, user: undefined, isLoading: false });
       return false;
     }
 
     if (!resp.ok) {
-      set({ errorMessage: resp.message });
+      set({ errorMessage: resp.message, isLoading: false });
       return false;
     }
 
@@ -92,7 +97,8 @@ export const useAuthStore = create<AuthState>(set => ({
       status: 'authenticated',
       token: resp.data.token,
       user: resp.data.user,
-      errorMessage: undefined
+      errorMessage: undefined,
+      isLoading: false
     });
 
     return true;
