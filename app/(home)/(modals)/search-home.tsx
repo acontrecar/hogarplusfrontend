@@ -9,7 +9,7 @@ import { useHomeStore } from '../../../store/useHomeStore';
 import { sleep } from '../../../hooks/useSleep';
 
 export default function SearchHomeModal() {
-  const [searchCode, setSearchCode] = useState('4ZSbJ4ZTL8pYKyV');
+  const [searchCode, setSearchCode] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const { joinPersonToHome, getHomesByUser } = useHomeStore();
