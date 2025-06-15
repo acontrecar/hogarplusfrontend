@@ -26,10 +26,10 @@ export default function RegisterScreen() {
     formState: { errors }
   } = useForm<RegisterFormInputs>({
     defaultValues: {
-      email: 'prueba@prueba.com',
-      password: 'seguroMucho123',
-      confirmPassword: 'seguroMucho123',
-      name: 'Antonio'
+      email: '',
+      password: '',
+      confirmPassword: '',
+      name: ''
     },
     mode: 'onChange'
   });
